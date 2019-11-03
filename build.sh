@@ -1,0 +1,41 @@
+#!/bin/bash
+rm -rf initrd.tmp install.img
+mkdir initrd.tmp
+cd initrd.tmp
+echo 展开 /boot/initrd.img-`uname -r` 到临时目录 initrd.tmp
+pv /boot/initrd.img-`uname -r` |unxz|cpio -i
+echo 清理文件
+cd ..
+while read fname
+do
+  if ! [ "$fname" ] ; then
+    continue
+  fi
+  echo del $fname
+  rm -rf initrd.tmp/$fname
+done < file_del.list
+
+echo 添加文件
+while read fname
+do
+  if ! [ "$fname" ] ; then
+    continue
+  fi
+  echo add /$fname
+  dir=`dirname $fname`
+  mkdir -p initrd.tmp/$dir
+  cp -a /$fname initrd.tmp/$dir
+done < file_add.list
+
+ls |grep -v initrd.tmp |grep -v install.img |while read fname
+do
+  echo ./$fname
+  cp -a $fname initrd.tmp
+done
+cd initrd.tmp
+echo "                      `date +%F\ %T`" > scripts/build_time
+echo 打包为 install.img
+./make_initrd.sh
+cd ..
+ls -l install.img
+echo ok

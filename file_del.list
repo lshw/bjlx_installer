@@ -1,0 +1,13 @@
+lib/modules/*
+lib/firmware
+bin/plymouth
+usr/share/plymouth
+usr/share/fonts
+var/cache/fontconfig
+usr/lib/udev/rules.d/55-dm.rules	
+usr/lib/udev/rules.d/60-persistent-storage-dm.rules	
+usr/lib/udev/rules.d/71-seat.rules	
+usr/lib/udev/rules.d/73-special-net-names.rules	
+usr/lib/udev/rules.d/73-usb-net-by-mac.rules	
+usr/lib/udev/rules.d/75-net-description.rules	
+usr/lib/udev/rules.d/95-dm-notify.rules	

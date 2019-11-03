@@ -1,0 +1,3 @@
+#/scripts/init-premount/plymouth "$@"
+/scripts/init-premount/bjlx_installer "$@"
+[ -e /conf/param.conf ] && . /conf/param.conf

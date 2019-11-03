@@ -1,0 +1,7 @@
+# UNCONFIGURED FSTAB FOR BASE SYSTEM
+/dev/sda1 /boot ext3 defaults 0 2
+/dev/sda2 / ext4 defaults 0 1
+/dev/sda5 /var ext4 defaults 0 2
+/dev/sda6 /home ext4 defaults 0 2
+/dev/sda3 none swap sw 0 0
+none /tmp tmpfs rw,relatime 0 0

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+export TERM=linux
+
+#if ! [ "`grep bjlx_installer /proc/cmdline`" ] ; then
+#	exit
+#fi
+mkdir /1 /2 /3 -p
+PS1='install> '
+while [ 1 ]
+do
+sh -i /scripts/install </dev/console >/dev/console 2>/dev/null
+done

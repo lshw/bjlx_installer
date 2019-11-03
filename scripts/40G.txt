@@ -1,0 +1,10 @@
+label: dos
+device: /dev/sda
+unit: sectors
+
+/dev/sda1 : start=2048, size=512M, type=83
+/dev/sda2 : size=15G, type=83
+/dev/sda3 : size=2G, type=82
+/dev/sda4 : type=5
+/dev/sda5 : size=5G, type=83
+/dev/sda6 : type=83

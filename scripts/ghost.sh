@@ -19,5 +19,5 @@ echo make /$dst_file
 if [ "`which pv`" ] ; then
   tar cp --exclude=/proc --exclude=/mnt --exclude=/tmp  --exclude=/lost+found --exclude=/sys --exclude=/media --exclude=/run --exclude=$dst_file * |pv|$gzrun >$dst_file
 else
-  tar cp --exclude=/proc --exclude=/mnt --exclude=/tmp  --exclude=/lost+found --exclude=/sys --exclude=/media --exclude=/run --exclude=$dst_file * |$gzrun >$dst_file
+ tar cpv --exclude=/proc --exclude=/mnt --exclude=/tmp  --exclude=/lost+found --exclude=/sys --exclude=/media --exclude=/run --exclude=$dst_file * |$gzrun >$dst_file
 fi

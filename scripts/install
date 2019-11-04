@@ -238,9 +238,10 @@ sleep 5
 poweroff
 fi
 
+mbr_bakfile=${dst_disk}.tab_bak`date +%Y%m%d%H%M%S`
 cat << EOF >/fdisk.txt
 O
-/1/${dst_disk}.tab_bak`date +%Y%m%d%H%M%S`
+/$mbr_bakfile
 q
 EOF
 fdisk </fdisk.txt >/dev/null 2>/dev/null
@@ -280,7 +281,8 @@ if [ $? != 0 ] ; then
  fsck -y ${dev} >/dev/null 2>/dev/null
  mount  ${dev} /1 >/dev/null 2>/dev/null
 fi	
-sleep 3
+sleep 2
+cp /$mbr_bakfile /1
 
 exec 1>/dev/console 
 exec 2>/dev/console 

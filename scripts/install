@@ -74,15 +74,14 @@ fi
 
 if [ "`uname -a |grep x86_64`" ] ; then 
  prefix="x86"
- dst_disk="sda"
  mkfs="mkfs.ext4 -F"
  ext4="ext4"
 else
  prefix="loongson"
- dst_disk="sda"
  mkfs="mkfs.ext4 -F"
  ext4="ext4"
 fi
+dst_disk="sda"
 export dst_disk="$dst_disk"
 
 cd /1
@@ -115,8 +114,7 @@ done #for dev in  /dev/sd* /dev/ub* /dev/cdrom*
 echo ========================================================= >/dev/console
 cd /
 umount /1
-if [ "${num}" = "0" ]
-then
+if [ "${num}" = "0" ] ;then
 echo tar package file not find ... >/dev/console
 echo rescan or shell? [Enter] >/dev/console
 read rescan
@@ -162,6 +160,10 @@ fi
 if [ -e /scripts/${select}.dev ]
 then
 dev=`cat /scripts/${select}.dev`
+if [ "`grep sda /scripts/${select}.dev`" ] ; then
+dst_disk=sdb
+export dst_disk="$dst_disk"
+fi
 file=`cat /scripts/${select}.file`
 size=`cat /scripts/${select}.size`
 else
@@ -222,9 +224,9 @@ fi
 
 echo >/dev/console
 echo ========================================================= >/dev/console
-hdparm -i /dev/sda |grep Model >/dev/console 2>/dev/null
+hdparm -i /dev/${dst_disk} |grep Model >/dev/console 2>/dev/null
 echo ========================================================= >/dev/console
-fdisk -l /dev/sda |grep sda >/dev/console 2>/dev/null
+fdisk -l /dev/${dst_disk} |grep ${dst_disk} >/dev/console 2>/dev/null
 echo ========================================================= >/dev/console
 
 echo  DISK /dev/${dst_disk}* ALL DATA WILL DELETE!!!   continue? [yes/No] >/dev/console
@@ -244,7 +246,7 @@ EOF
 fdisk </fdisk.txt >/dev/null 2>/dev/null
 
 dd if=/dev/zero of=/dev/${dst_disk} count=1 bs=512
-sda_size=`hdparm -i /dev/sda|tr ',' "\n"|grep LBAsects|tr '=' "\n"|grep -v LBAsects|tr -d "\r\n"`
+sda_size=`hdparm -i /dev/${dst_disk}|tr ',' "\n"|grep LBAsects|tr '=' "\n"|grep -v LBAsects|tr -d "\r\n"`
 if [ "$sda_size" -lt "40000000" ] ; then
 	fdisk_script=16G.txt
 	echo size=$sda_size select 16G.txt
@@ -342,10 +344,12 @@ mount  -t ext3 /dev/${dst_disk}1 /2/boot
 mount -t devtmpfs none /2/dev
 mount -t proc none /2/proc
 mount -t sysfs none /2/sys
-chroot /2 grub-install /dev/sda
+chroot /2 grub-install /dev/${dst_disk}
 chroot /2 update-grub2
 fi
 umount /1
+
+cp /scripts/ghost.sh /2/usr/local/sbin
 
 echo 9. ok! >/dev/console
 echo please reboot. >/dev/console

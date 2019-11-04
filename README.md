@@ -11,6 +11,7 @@ shell环境带了 fdisk,cfdisk , mkfs.ext234 , mkfs.vfat , fsck.ext234 , bootstr
 执行 build.sh  会生成install.img  
 然后配合vmlinuz  就可以用来快速安装linux系统了  
 
+udisk目录下，就是做好的龙芯2K，龙芯3的安装程序，可以复制到U盘直接使用.  
 linux系统的tar包， 可以在 https://mirrors.tuna.tsinghua.edu.cn/loongson/install 下载  
 也可以自行打包， 只要文件命名为 loongson*20*.tar.* ， 就可以被识别使用  
-比如 loongson-2k-debian10-20191105.tar.xz  
+比如 loongson-2k-debian10-20191105.tar.xz    

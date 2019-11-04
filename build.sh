@@ -37,5 +37,7 @@ echo "                      `date +%F\ %T`" > scripts/build_time
 echo 打包为 install.img
 ./make_initrd.sh
 cd ..
-ls -l install.img
+mv install.img udisk
+cp boot.cfg udisk
+ls -l udisk
 echo ok

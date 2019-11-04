@@ -344,12 +344,18 @@ mount -t proc none /2/proc
 mount -t sysfs none /2/sys
 chroot /2 grub-install /dev/sda
 chroot /2 update-grub2
-umount /2/dev /2/proc /2/sys
 fi
+umount /1
 
-umount /1 /2
 echo 9. ok! >/dev/console
 echo please reboot. >/dev/console
+umount /2/dev /2/proc /2/sys
+munt -o move /2 /root
+mount -o move /dev /root/dev
+mount -o move /sys /root/sys
+mount -o move /proc /root/proc
+chroot /root /sbin/init
+
 while read select
 do
  sleep 3

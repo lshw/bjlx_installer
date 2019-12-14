@@ -1,6 +1,13 @@
 #!/bin/bash
 rm -rf initrd.tmp install.img
 mkdir initrd.tmp udisk -p
+if ! [ -x /usr/bin/git ] ; then
+	apt-get install git
+fi
+echo -ne "git clone  ">git_commit_id.txt
+git config --get remote.origin.url >>git_commit_id.txt
+git rev-list --format=format:'%ai' --max-count=1 `git rev-parse HEAD` >>git_commit_id.txt
+echo ==============================================>>git_commit_id.txt
 if ! [ -x /sbin/hdparm ] ; then
 	apt-get install hdparm
 fi
@@ -45,7 +52,7 @@ do
   cp -a $fname initrd.tmp
 done
 cd initrd.tmp
-echo "                      `date +%F\ %T`" > scripts/build_time
+echo "build:       `date +%F\ %T`" > scripts/build_time
 echo 打包为 install.img
 ./make_initrd.sh
 cd ..

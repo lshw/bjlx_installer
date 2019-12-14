@@ -1,6 +1,12 @@
 #!/bin/bash
 rm -rf initrd.tmp install.img
-mkdir initrd.tmp
+mkdir initrd.tmp udisk -p
+if ! [ -x /sbin/hdparm ] ; then
+	apt-get install hdparm
+fi
+if ! [ -x /usr/sbin/debootstrap ] ; then
+	apt-get install debootstrap
+fi
 cd initrd.tmp
 echo 展开 /boot/initrd.img-`uname -r` 到临时目录 initrd.tmp
 pv /boot/initrd.img-`uname -r` |unxz|cpio -i

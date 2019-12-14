@@ -10,6 +10,12 @@ fi
 cd initrd.tmp
 echo 展开 /boot/initrd.img-`uname -r` 到临时目录 initrd.tmp
 pv /boot/initrd.img-`uname -r` |unxz|cpio -i
+if [ $? != 0 ] ;then
+pv /boot/initrd.img-`uname -r` |lzma -dc|cpio -i
+if [ $? != 0 ] ;then
+pv /boot/initrd.img-`uname -r` |gunzip|cpio -i
+fi
+fi
 echo 清理文件
 cd ..
 while read fname

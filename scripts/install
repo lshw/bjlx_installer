@@ -317,6 +317,10 @@ if [ -e /2/tmp/fix.sh ] ;then
 chmod 777 /2/tmp/fix.sh
 chroot /2 /tmp/fix.sh
 fi
+if [ -e /2/fix.sh ] ;then
+chmod 777 /2/fix.sh
+chroot /2 /fix.sh
+fi
 cp /scripts/update-pmon /2/tmp
 chroot /2 /tmp/update-pmon
 umount /2/proc /2/dev /2/sys

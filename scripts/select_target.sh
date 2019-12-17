@@ -1,6 +1,6 @@
 #!/bin/bash
 select_txt="please select target disk:["
-for dst in {a..z}
+for dst in a b c d e f g h i j k l m n o p q r s t u v w x y z
 do
  if ! [ -e /dev/sd$dst ] ; then
   continue

@@ -28,6 +28,8 @@ sleep 3
 return
 }
 
+##风扇全开
+/scripts/wd.sh >/dev/null 2>/dev/null
 if ! [ -s /scripts/reinstall ] ; then
 udevd -d >/dev/null 2>/dev/null
 sleep 3
@@ -158,7 +160,7 @@ if [ -e /scripts/${select}.dev ] ;then
  dev=`cat /scripts/${select}.dev`
  cp /scripts/${select}.dev src_dev
  if [ -e /dev/sdc ] ; then ##多于2个磁盘， 需要选一下
-  /scripts/select_target.sh 
+  /scripts/select_target.sh >/dev/console
   dst_disk=`cat /dst_disk`
  else ##2个磁盘
   if [ "`grep sda /scripts/${select}.dev`" ] ; then
@@ -186,9 +188,7 @@ clear
 exec 1>/dev/null
 exec 2>/dev/null
 
-cat /scripts/version >/dev/console
-cat /git_commit_id.txt >/dev/console
-cat /scripts/build_time >/dev/console
+cat /version.txt >/dev/console
 echo ========================================================= >/dev/console
 echo $dev $file $size >/dev/console
 echo ========================================================= >/dev/console

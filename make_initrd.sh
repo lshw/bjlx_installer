@@ -23,4 +23,4 @@ usize=`du -ks udisk|awk '{printf $1}'`
 size=$(( $asize - $usize ))
 
 #find . |cpio -H newc -o 2>/dev/null |pv -s ${size}000|lzma >../install.img
-find . \( -path ./1 -o -path ./2 -o -path ./3 -o -path ./initrd.tmp -o -path ./var/cache/fontconfig -o -path ./udisk \) -prune -o -print |cpio -H newc -o 2>/dev/null |pv -s ${size}000|lzma >$ofile
+find . \( -path ./initrd.tmp -o -path ./var/cache/fontconfig -o -path ./udisk \) -prune -o -print |cpio -H newc -o 2>/dev/null |pv -s ${size}000|lzma >$ofile

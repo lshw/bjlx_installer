@@ -1,4 +1,4 @@
 install.img
 initrd.tmp
 udisk
-git_commit_id.txt
+version.txt

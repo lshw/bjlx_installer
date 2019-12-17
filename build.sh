@@ -4,12 +4,19 @@ mkdir initrd.tmp udisk -p
 if ! [ -x /usr/bin/git ] ; then
 	apt-get install git
 fi
-echo -ne "git clone  ">git_commit_id.txt
-git config --get remote.origin.url >>git_commit_id.txt
-git rev-list --format=format:'%ai' --max-count=1 `git rev-parse HEAD` >>git_commit_id.txt
-echo ==============================================>>git_commit_id.txt
+build_time=`date +%F\ %T`
+git_url=`git config --get remote.origin.url`
+git_commit_id=`git rev-parse --short HEAD`
+git_commit_time=`git rev-list --format=format:'%ai' --max-count=1 $git_commit_id |tail -n1`
+echo "Loongson Linux Installer   build:$build_time
+$git_url Ver:$git_commit_id $git_commit_time
+" >version.txt
+
 if ! [ -x /sbin/hdparm ] ; then
 	apt-get install hdparm
+fi
+if ! [ -x /usr/bin/pv ] ; then
+	apt-get install pv
 fi
 if ! [ -x /usr/sbin/debootstrap ] ; then
 	apt-get install debootstrap
@@ -46,13 +53,12 @@ do
   cp -a /$fname initrd.tmp/$dir
 done < file_add.list
 
-ls |grep -v initrd.tmp |grep -v install.img |while read fname
+ls |grep -v initrd.tmp |grep -v install.img |grep -v udisk |while read fname
 do
   echo ./$fname
   cp -a $fname initrd.tmp
 done
 cd initrd.tmp
-echo "build:       `date +%F\ %T`" > scripts/build_time
 echo 打包为 install.img
 ./make_initrd.sh
 cd ..

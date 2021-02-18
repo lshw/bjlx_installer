@@ -2,18 +2,28 @@
 rm -rf initrd.tmp install.img
 mkdir initrd.tmp udisk -p
 if ! [ -x /sbin/hdparm ] ; then
-	apt-get install hdparm
+	apt-get -y install hdparm
+fi
+if ! [ -x /usr/bin/pv ] ; then
+	apt-get -y install pv
 fi
 if ! [ -x /usr/sbin/debootstrap ] ; then
-	apt-get install debootstrap
+	apt-get -y install debootstrap
 fi
 cd initrd.tmp
-echo 展开 /boot/initrd.img-`uname -r` 到临时目录 initrd.tmp
-pv /boot/initrd.img-`uname -r` |unxz|cpio -i
+
+echo "请选择内核版本："
+select ker in $(ls /lib/modules/);do
+    ker_ver="$ker"
+    break
+done
+
+echo 展开 /boot/initrd.img-$ker_ver 到临时目录 initrd.tmp
+pv /boot/initrd.img-$ker_ver |unxz|cpio -i
 if [ $? != 0 ] ;then
-pv /boot/initrd.img-`uname -r` |lzma -dc|cpio -i
+pv /boot/initrd.img-$ker_ver |lzma -dc|cpio -i
 if [ $? != 0 ] ;then
-pv /boot/initrd.img-`uname -r` |gunzip|cpio -i
+pv /boot/initrd.img-$ker_ver |gunzip|cpio -i
 fi
 fi
 echo 清理文件
@@ -42,7 +52,7 @@ done < file_add.list
 ls |grep -v initrd.tmp |grep -v install.img |while read fname
 do
   echo ./$fname
-  cp -a $fname initrd.tmp
+  cp -a $fname initrd.tmp | true
 done
 cd initrd.tmp
 echo "                      `date +%F\ %T`" > scripts/build_time

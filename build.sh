@@ -71,6 +71,8 @@ echo 打包为 install.img
 cd ..
 mv install.img udisk
 echo cp /boot/vmlinu*$fname udisk/vmlinuz
-cp boot.cfg udisk
+if [ "`uname -m`" == 'mips64' ];then
+  cp boot.cfg udisk
+fi
 ls -l udisk
 echo ok

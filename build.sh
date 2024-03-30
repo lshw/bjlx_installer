@@ -1,17 +1,20 @@
 #!/bin/bash
 rm -rf initrd.tmp install.img
 mkdir initrd.tmp udisk -p
-if ! [ -x /sbin/hdparm ] ; then
-	apt-get -y install hdparm
-fi
-if ! [ -x /usr/bin/pv ] ; then
-	apt-get -y install pv
-fi
-if ! [ -x /usr/sbin/debootstrap ] ; then
-	apt-get -y install debootstrap
-fi
-cd initrd.tmp
 
+if ! [ -x /sbin/hdparm ] \
+    || ! [ -x /usr/bin/pv ] \
+    || ! [ -x /usr/sbin/debootstrap ] \
+    || ! [ -x /usr/sbin/mkfs.vfat ] \
+    || ! [ -x /usr/bin/unzstd ] \
+    || ! [ -x /usr/sbin/mkfs.vfat ]
+then
+    install_dev="y"
+    apt update
+    apt-get -y install hdparm pv dosfstools debootstrap
+fi
+
+cd initrd.tmp
 echo "请选择内核版本："
 select ker in $(ls /lib/modules/);do
     ker_ver="$ker"
@@ -19,11 +22,18 @@ select ker in $(ls /lib/modules/);do
 done
 
 echo 展开 /boot/initrd.img-$ker_ver 到临时目录 initrd.tmp
-pv /boot/initrd.img-$ker_ver |unxz|cpio -i
+gz=xz
+pv /boot/initrd.img-$ker_ver |unxz 2>/dev/null |cpio -i  2>/dev/null
 if [ $? != 0 ] ;then
-pv /boot/initrd.img-$ker_ver |lzma -dc|cpio -i
+gz=lzma
+pv /boot/initrd.img-$ker_ver |lzma -dc 2>/dev/null |cpio -i 2>/dev/null
 if [ $? != 0 ] ;then
-pv /boot/initrd.img-$ker_ver |gunzip|cpio -i
+gz=gzip
+pv /boot/initrd.img-$ker_ver |gunzip 2>/dev/null |cpio -i 2>/dev/null
+if [ $? != 0 ] ;then
+gz="zstd -19"
+pv /boot/initrd.img-$ker_ver |unzstd 2>/dev/null |cpio -i 2>/dev/null
+fi
 fi
 fi
 echo 清理文件
@@ -47,7 +57,7 @@ do
   dir=`dirname $fname`
   mkdir -p initrd.tmp/$dir
   cp -a /$fname initrd.tmp/$dir
-done < file_add.list
+done < `uname -m`/file_add.list
 
 ls |grep -v initrd.tmp |grep -v install.img |while read fname
 do
@@ -57,9 +67,10 @@ done
 cd initrd.tmp
 echo "                      `date +%F\ %T`" > scripts/build_time
 echo 打包为 install.img
-./make_initrd.sh
+./make_initrd.sh "$gz"
 cd ..
 mv install.img udisk
+echo cp /boot/vmlinu*$fname udisk/vmlinuz
 cp boot.cfg udisk
 ls -l udisk
 echo ok

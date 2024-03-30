@@ -6,7 +6,8 @@ lib/loongarch64-linux-gnu/libe2p.so*
 lib/loongarch64-linux-gnu/libdl.so*
 lib/loongarch64-linux-gnu/libc.so*
 lib/loongarch64-linux-gnu/libpthread.so*
-lib/loongarch64-linux-gnu/libtinfo.so.*
-lib/loongarch64-linux-gnu/libfdisk.so.1*
-lib/loongarch64-linux-gnu/libsmartcols.so.1*
-lib/loongarch64-linux-gnu/libncursesw.so.*
+lib/loongarch64-linux-gnu/libtinfo.so*
+lib/loongarch64-linux-gnu/libfdisk.so*
+lib/loongarch64-linux-gnu/libreadline.so*
+lib/loongarch64-linux-gnu/libsmartcols.so*
+lib/loongarch64-linux-gnu/libncursesw.so*

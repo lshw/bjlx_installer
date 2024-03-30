@@ -3,84 +3,91 @@
 export TERM=linux
 run_shell() {
 cd /
-umount /1 
-umount /2
-exec 1>/dev/console
-exec 2>/dev/console
+umount /1  /2 2>/dev/null
 /bin/sh
 exit
 }
 
 delay_disp() {
 sleep 2
-echo 5 >/dev/console
+echo 5
 sleep 2
-echo 4 >/dev/console
+echo 4
 sleep 2
-echo 3 >/dev/console
+echo 3
 sleep 2
-echo 2 >/dev/console
+echo 2
 sleep 2
-echo 1 >/dev/console
+echo 1
 sleep 2
-echo 0 >/dev/console
+echo 0
 sleep 3
 return
 }
 
+zstd=9402075ea79ca9bb95dc2c7082656d9e
+gz=5b25786f919872ca265a821a845567c0
+xz=a911b981b57c7ff4459151d00c7a42e9
+lzma=316d74ab46ce480017d6db2d43358db4
+ansi_red="\x1b[31m"
+ansi_w="\x1b[0m"
+mkdir -p /1 /2
 if ! [ -s /scripts/reinstall ] ; then
 udevd -d >/dev/null 2>/dev/null
 sleep 3
 fi
 
 clear
-exec 1>/dev/null
-exec 2>/dev/null
-echo >/dev/console
-echo >/dev/console
-echo >/dev/console
-modprobe vfat
-modprobe nls_cp437
-modprobe nls_utf8
+#exec 2>/dev/null
+
+echo
+echo
+echo
+modprobe vfat 2>/dev/null
+modprobe nls_cp437 2>/dev/null
+modprobe nls_utf8 2>/dev/null
+modprobe ext4 2>/dev/null
 
 for dev in /sys/block/sd*
 do
  echo "add" > ${dev}/uevent
 done
 
-echo Scaning.... >/dev/console
+echo Scaning....
 sleep 4
 
-echo ========================================================= >/dev/console
+echo =========================================================
 num=0
 for dev in  /dev/sd* 
 do
 
 cd /
-umount /1
+umount /1 2>/dev/null
 mount ${dev} /1 >/dev/null 2>/dev/null
 
 if ! [ -s /scripts/reinstall ] ; then
 if [ -s  /1/install ] ; then
 cd /
 cp /1/install /sbin
-umount /1
+umount /1 2>/dev/null
 chmod 755 /sbin/install
 date >/scripts/reinstall
 /sbin/install
 exit
 fi #-s /1/install
 fi
-
-if [ "`uname -a |grep x86_64`" ] ; then 
- prefix="x86"
- mkfs="mkfs.ext4 -F"
- ext4="ext4"
-else
- prefix="loongson"
- mkfs="mkfs.ext4 -F"
- ext4="ext4"
-fi
+ m=$( uname -m )
+case $m  in
+  x86_64)
+    prefix="x86"
+    ;;
+  mips64)
+    prefix="loongson"
+    ;;
+  *)
+    prefix=$m
+    ;;
+esac
 dst_disk="sda"
 export dst_disk="$dst_disk"
 
@@ -95,28 +102,28 @@ if [ "`echo $fname |grep patch`" ] ; then
 fi
 
 num=$(( $num + 1 ))
-dd if=/1/$fname count=2 bs=1 of=/scripts/${num}.magic
-if [ "${fname##*.}" != "lzma" ] ; then
- if [ "${fname##*.}" != "xz" ] ; then
-  if [ "`md5sum /scripts/${num}.magic |grep -v 5b25786f919872ca265a821a845567c0 |grep -v e45fbcf6ca3b21f17c5f355728a2fbec`" ] ;then
+dd if=/1/$fname count=2 bs=1 of=/scripts/${num}.magic >/dev/null 2>/dev/null
+md5sum /scripts/${num}.magic
+if [ "a`md5sum /scripts/${num}.magic |grep -v -e $zstd -e $xz -e $gz -e $lzma`" =="a" ] ; then
+     echo skip $fname
    num=$(( $num - 1 ))
-   continue
-  fi
- fi
+ else
+   echo ok $fname
 fi
+
 size=`ls -kl /1/$fname  |awk '{ printf int($5/1000000+0.5)"M"}'`
 echo $size >/scripts/${num}.size
-echo -e "$num\t${dev}\t$fname\t$size" >/dev/console
+echo -e "$num\t${dev}\t$fname\t$size"
 echo $dev >/scripts/${num}.dev
 echo $fname >/scripts/${num}.file
 done #for fname in loongson*_20*.tar.*
 done #for dev in  /dev/sd* /dev/ub* /dev/cdrom*
-echo ========================================================= >/dev/console
+echo =========================================================
 cd /
-umount /1
+umount /1 2>/dev/null
 if [ "${num}" = "0" ] ;then
-echo tar package file not find ... >/dev/console
-echo rescan or shell? [Enter] >/dev/console
+echo tar package file not find ...
+echo rescan or shell? [Enter]
 read rescan
 case "$rescan" in 
 	shell)
@@ -126,11 +133,11 @@ case "$rescan" in
 	poweroff
 	;;
 	*)
-	echo insert new u-disk, please. >/dev/console
+	echo insert new u-disk, please.
 	echo rescan >/scripts/reinstall
 	delay_disp
 	cd /
-	umount /1
+	umount /1 2>/dev/null
 	exit
 	;;
 esac	
@@ -140,16 +147,16 @@ if [ "$num" = "1" ]
 then 
 select=1
 else
-echo Please Select [1,2,3...,rescan,shell]: >/dev/console
+echo Please Select [1,2,3...,rescan,shell]:
 read select 
 if [ "a$select" = "a" ] || [ "$select" = "rescan" ]]
 then
-echo Rescan... >/dev/console
-echo Please insert new  u-disk >/dev/console
+echo Rescan...
+echo Please insert new  u-disk
 echo rescan >/scripts/reinstall
 delay_disp
 cd /
-umount /1
+umount /1 2>/dev/null
 exit
 fi
 if [ "$select" = "shell" ]
@@ -164,30 +171,28 @@ if [ "`grep sda /scripts/${select}.dev`" ] ; then
 dst_disk=sdb
 export dst_disk="$dst_disk"
 fi
+dst_disk=sde
+export dst_disk=$dst_disk
 file=`cat /scripts/${select}.file`
 size=`cat /scripts/${select}.size`
 else
 echo rescan >/scripts/reinstall
-echo Rescan... >/dev/console
-echo Please insert new  u-disk >/dev/console
+echo Rescan...
+echo Please insert new  u-disk
 delay_disp
 cd /
-umount /1
+umount /1 2>/dev/null
 exit
 fi
 
-exec 1>/dev/console
-exec 2>/dev/console
 clear
-exec 1>/dev/null
-exec 2>/dev/null
 
-cat /scripts/version >/dev/console
-cat /scripts/build_time >/dev/console
-echo ========================================================= >/dev/console
-echo $dev $file $size >/dev/console
-echo ========================================================= >/dev/console
-echo disk /dev/${dst_disk} All data will delete!   continue? [yes/No/rescan/shell] >/dev/console
+cat /scripts/version
+cat /scripts/build_time
+echo =========================================================
+echo $dev $file $size
+echo =========================================================
+echo disk /dev/${dst_disk} All data will delete!   continue? [yes/No/rescan/shell]
 read seta
 if [ "$seta" = "shell" ]
 then
@@ -196,85 +201,71 @@ fi
 if [ "$seta" = "rescan" ] 
 then
 echo rescan >/scripts/reinstall
-echo Rescan... >/dev/console
-echo Please insert new  u-disk >/dev/console
+echo Rescan...
+echo Please insert new  u-disk
 delay_disp
 cd /
-umount /1
+umount /1 2>/dev/null
 exit
 fi
 
 if [ "a$seta" = "a" ]
 then
 echo rescan >/scripts/reinstall
-echo Rescan... >/dev/console
-echo Please insert new  u-disk >/dev/console
+echo Rescan...
+echo Please insert new  u-disk
 delay_disp
 cd /
-umount /1
+umount /1  2>/dev/null
 exit
 fi
 
 if [ "${seta}" != "yes" ]
 then
-echo No! Poweroff... >/dev/console
+echo No! Poweroff...
 sleep 5
 poweroff
 fi
 
-echo >/dev/console
-echo ========================================================= >/dev/console
-hdparm -i /dev/${dst_disk} |grep Model >/dev/console 2>/dev/null
-echo ========================================================= >/dev/console
-fdisk -l /dev/${dst_disk} |grep ${dst_disk} >/dev/console 2>/dev/null
-echo ========================================================= >/dev/console
+echo
+echo =========================================================
+hdparm -i /dev/${dst_disk} |grep Model
+echo =========================================================
+lsblk /dev/${dst_disk}
+echo =========================================================
 
-echo  DISK /dev/${dst_disk}* ALL DATA WILL DELETE!!!   continue? [yes/No] >/dev/console
+echo DISK /dev/${dst_disk}*
+echo -e "${ansi_red}ALL DATA WILL DELETE!!!${ansi_w}"
+echo continue? [yes/No]
 read seta
 if [ "$seta" != "yes" ]
 then
-echo No! Poweroff... >/dev/console
+echo No! Poweroff...
 sleep 5
 poweroff
 fi
 
 mbr_bakfile=${dst_disk}.tab_bak`date +%Y%m%d%H%M%S`
-cat << EOF >/fdisk.txt
-O
-/$mbr_bakfile
-q
-EOF
-fdisk </fdisk.txt >/dev/null 2>/dev/null
+sfdisk -d /dev/${dst_disk} > /${mbr_bakfile}
 
-dd if=/dev/zero of=/dev/${dst_disk} count=1 bs=512
-sda_size=`hdparm -i /dev/${dst_disk}|tr ',' "\n"|grep LBAsects|tr '=' "\n"|grep -v LBAsects|tr -d "\r\n"`
-if [ "$sda_size" -lt "40000000" ] ; then
-	fdisk_script=16G.txt
-	echo size=$sda_size select 16G.txt
-else
-	fdisk_script=40G.txt
-	echo size=$sda_size select 40G.txt
-fi
-cat << EOF >/fdisk.txt
-I
-/scripts/$fdisk_script
-w
-q
-EOF
-fdisk /dev/${dst_disk}	</fdisk.txt >/dev/null 2>/dev/null
+dd if=/dev/zero of=/dev/${dst_disk} count=1 bs=512 >/dev/null 2>/dev/null
+sfdisk --force /dev/${dst_disk}	<scripts/120G.txt >/dev/null 2>/dev/null
 sleep 3
-echo "1. format /dev/${dst_disk}1" >/dev/console
-mkfs.ext3 -L boot -F /dev/${dst_disk}1  
-echo "2. format /dev/${dst_disk}2" >/dev/console
-$mkfs -L root /dev/${dst_disk}2
-mkswap /dev/${dst_disk}3
-echo "3. format /dev/${dst_disk}5" >/dev/console
-$mkfs -L var /dev/${dst_disk}5 
-echo "4. format /dev/${dst_disk}6" >/dev/console
-$mkfs -L home /dev/${dst_disk}6
-mount -o barrier=0 -t ${ext4} /dev/${dst_disk}2 /2 >/dev/null 2>/dev/null
+echo "1. format /dev/${dst_disk}1 /boot"
+mkfs.ext3 -L boot -F /dev/${dst_disk}1  >/dev/null 2>/dev/null
+echo "2. format /dev/${dst_disk}2 /boot/efi"
+mkfs.vfat -L EFI /dev/${dst_disk}2 >/dev/null 2>/dev/null
+echo "3. format /dev/${dst_disk}3 swap"
+mkswap -L SWAP /dev/${dst_disk}3 >/dev/null 2>/dev/null
+echo "4. format /dev/${dst_disk}4 /"
+mkfs.ext4 -L root -F /dev/${dst_disk}4  >/dev/null 2>/dev/null
+mount -o barrier=0 -t ext4 /dev/${dst_disk}4 /2 >/dev/null 2>/dev/null
+mkdir -p /2/boot
+mount -t ext3 /dev/${dst_disk}1 /2/boot
+mkdir -p /2/boot/efi
+mount -t vfat /dev/${dst_disk}2 /2/boot/efi
 cd /2
-umount /1
+umount /1 2>/dev/null
 mount  ${dev} /1 >/dev/null 2>/dev/null
 if [ $? != 0 ] ; then
  umount /1 >/dev/null 2>/dev/null
@@ -284,35 +275,30 @@ fi
 sleep 2
 cp /$mbr_bakfile /1
 
-exec 1>/dev/console 
-exec 2>/dev/console 
-echo 5. export $file to /dev/${dst_disk}2
-if [ "a${file##*.}" = "alzma" ] ;then 
- ##is .lzma
- pv /1/$file |lzmadec|tar x -C /2
-else 
- if [ "a${file##*.}" = "axz" ]; then
-  pv /1/$file |tar Jx -C /2
- else
-  if [ "`md5sum /scripts/${select}.magic |grep  5b25786f919872ca265a821a845567c0`" ]
-  then ##is .gz
-   pv /1/$file |tar zx -C /2
-  else ##is .bz2
-   pv /1/$file |tar jx -C /2
-  fi ##[ "`md5sum /scripts/${select}.magic |grep  5b25786f919872ca265a821a845567c0`" ]
- fi ##[ "a${file##*.}" = "axz" ]
-fi ##[ "a${file##*.}" = "alzma" ]
+echo 5. export $file to /dev/${dst_disk}4
+magic=$( md5sum /scripts/${select}.magic |awk '{print $1}' )
+case $magic in
+  $lzma)
+    gunzip=lzma
+    ;;
+  $gz)
+    gunzip=gzip
+    ;;
+  $zstd)
+    gunzip=zstd
+    ;;
+  $xz)
+    gunzip=xz
+    ;;
+esac
 
-exec 1>/dev/null 
-exec 2>/dev/null 
-
-cp /boot.cfg /2/boot/boot.cfg
-cp /scripts/fstab /2/etc
-
-rm /2/etc/udev/rules.d/70-persistent-net.rules
+ pv /1/$file |$gunzip -dc|tar x -C /2
+rm -f /2/etc/udev/rules.d/70-persistent-net.rules
 mount -t proc none /2/proc >/dev/null 2>/dev/null
 mount -t sysfs none /2/sys >/dev/null 2>/dev/null
 mount -t devtmpfs none /2/dev >/dev/null 2>/dev/null
+cp /scripts/fstab /2/etc
+
 if [ -e /2/tmp/fix.sh ] ;then
 chmod 777 /2/tmp/fix.sh
 chroot /2 /tmp/fix.sh
@@ -321,50 +307,30 @@ if [ -e /2/fix.sh ] ;then
 chmod 777 /2/fix.sh
 chroot /2 /fix.sh
 fi
-cp /scripts/update-pmon /2/tmp
-chroot /2 /tmp/update-pmon
-umount /2/proc /2/dev /2/sys
-cp /2/boot/boot.cfg /1
-umount /1
 
-mount -t ext3 /dev/${dst_disk}1 /3 >/dev/null 2>/dev/null
-echo  >/dev/console
-echo  >/dev/console
-echo "6. copy /boot/* to /dev/${dst_disk}1"  >/dev/console
-cp -a /2/boot/* /3
-umount /3
-
-mount -o barrier=0 -t ${ext4} /dev/${dst_disk}5 /3 >/dev/null 2>/dev/null
-echo "7. copy /var/* to /dev/${dst_disk}5"  >/dev/console
-echo       Please wait ...... >/dev/console
-cp -a /2/var/* /3
-umount /3
-
-mount -o barrier=0 -t ${ext4} /dev/${dst_disk}6 /3 >/dev/null 2>/dev/null
-echo "8. copy /home/* to /dev/${dst_disk}6"  >/dev/console
-cp -a /2/home/* /3
-umount /3  /2/tmp
-
-if [ "`uname -a |grep x86`" ] ;then
-mount  -t ext3 /dev/${dst_disk}1 /2/boot
-mount -t devtmpfs none /2/dev
-mount -t proc none /2/proc
-mount -t sysfs none /2/sys
-chroot /2 grub-install /dev/${dst_disk}
-chroot /2 update-grub2
-fi
-umount /1
+case $m in 
+  x86_64)
+    ;;
+  mips64)
+    cp /scripts/boot.cfg /2/boot/boot.cfg
+    cp /scripts/update-pmon /2/tmp
+    chroot /2 /tmp/update-pmon
+    ;;
+  *)
+chroot /2 update-grub >/dev/null 2>/dev/null
+chroot /2 grub-install /dev/${dst_disk} >/dev/null 2>/dev/null
+;;
+esac
 
 cp /scripts/ghost.sh /2/usr/local/sbin
+umount -f /2/boot/efi >/dev/null 2>/dev/null
+umount -f /2/proc /2/dev /2/sys /2/boot >/dev/null 2>/dev/null
+umount -f /2 /1 >/dev/null 2>/dev/null
 
-echo 9. ok! >/dev/console
-echo please reboot. >/dev/console
-umount /2/dev /2/proc /2/sys
-munt -o move /2 /root
-mount -o move /dev /root/dev
-mount -o move /sys /root/sys
-mount -o move /proc /root/proc
-chroot /root /sbin/init
+
+echo 9. ok!
+echo please reboot.
+umount /2/dev /2/proc /2/sys 2>/dev/null
 
 while read select
 do

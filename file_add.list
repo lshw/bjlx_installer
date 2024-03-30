@@ -1,8 +1,16 @@
 usr/bin/pv
+usr/bin/lsblk
+usr/bin/zstd
 usr/sbin/debootstrap
 sbin/cfdisk
+sbin/sfdisk
+sbin/fdisk
 usr/share/terminfo/x/xterm-utf8
 usr/share/terminfo/x/xterm-color
+usr/share/terminfo/l/linux
+usr/share/terminfo/l/linux-16color
+usr/share/terminfo/x/xterm
+usr/share/terminfo/x/xterm-256color
 sbin/hdparm
 sbin/fsck
 sbin/e2fsck
@@ -12,3 +20,4 @@ sbin/fsck.msdos
 sbin/fsck.vfat
 sbin/mke2fs
 sbin/mkfs.ext*
+sbin/mkfs.vfat

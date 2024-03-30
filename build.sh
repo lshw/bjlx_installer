@@ -15,11 +15,14 @@ then
 fi
 
 cd initrd.tmp
+ker_ver=$(ls /lib/modules/)
+if [ "`echo $ker_ver |awk '{print $2}'`" ] ; then
 echo "请选择内核版本："
-select ker in $(ls /lib/modules/);do
+select ker in $ker_ver; do
     ker_ver="$ker"
     break
 done
+fi
 
 echo 展开 /boot/initrd.img-$ker_ver 到临时目录 initrd.tmp
 gz=xz
@@ -48,7 +51,7 @@ do
 done < file_del.list
 
 echo 添加文件
-cat file_add.lst $( uname -m )/file_add.list |\
+cat file_add.list $( uname -m )/file_add.list |\
 while read fname
 do
   if ! [ "$fname" ] ; then
@@ -60,13 +63,8 @@ do
   cp -a /$fname initrd.tmp/$dir
 done
 
-ls |grep -v initrd.tmp |grep -v install.img |while read fname
-do
-  echo ./$fname
-  cp -a $fname initrd.tmp | true
-done
+cp -a etc scripts make_initrd.sh initrd.tmp
 cd initrd.tmp
-mkdir -p proc sys dev
 echo "                      `date +%F\ %T`" > scripts/build_time
 mkdir -p lib/modules/$ker_ver/kernel
 find /lib/modules/$ker_ver -name  vfat.ko* -exec cp {} lib/modules/$ker_ver/kernel \;

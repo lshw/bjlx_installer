@@ -48,6 +48,7 @@ do
 done < file_del.list
 
 echo 添加文件
+cat file_add.lst $( uname -m )/file_add.list |\
 while read fname
 do
   if ! [ "$fname" ] ; then
@@ -57,7 +58,7 @@ do
   dir=`dirname $fname`
   mkdir -p initrd.tmp/$dir
   cp -a /$fname initrd.tmp/$dir
-done < `uname -m`/file_add.list
+done
 
 ls |grep -v initrd.tmp |grep -v install.img |while read fname
 do
@@ -65,14 +66,19 @@ do
   cp -a $fname initrd.tmp | true
 done
 cd initrd.tmp
+mkdir -p proc sys dev
 echo "                      `date +%F\ %T`" > scripts/build_time
+mkdir -p lib/modules/$ker_ver/kernel
+find /lib/modules/$ker_ver -name  vfat.ko* -exec cp {} lib/modules/$ker_ver/kernel \;
+find /lib/modules/$ker_ver -name  nls_cp437.ko* -exec cp {} lib/modules/$ker_ver/kernel \;
+find /lib/modules/$ker_ver -name  nls_utf8.ko* -exec cp {} lib/modules/$ker_ver/kernel \;
+find /lib/modules/$ker_ver -name  ext4.ko* -exec cp {} lib/modules/$ker_ver/kernel \;
+chroot . depmod $ker_ver
 echo 打包为 install.img
 ./make_initrd.sh "$gz"
 cd ..
 mv install.img udisk
-echo cp /boot/vmlinu*$fname udisk/vmlinuz
-if [ "`uname -m`" == 'mips64' ];then
-  cp boot.cfg udisk
-fi
+cp /boot/vmlinu*$ker_ver udisk/vmlinuz
+cp boot.cfg udisk
 ls -l udisk
 echo ok

@@ -1,0 +1,14 @@
+usr/bin/pv
+usr/sbin/debootstrap
+sbin/cfdisk
+usr/share/terminfo/x/xterm-utf8
+usr/share/terminfo/x/xterm-color
+sbin/hdparm
+sbin/fsck
+sbin/e2fsck
+sbin/fsck.ext*
+sbin/fsck.fat
+sbin/fsck.msdos
+sbin/fsck.vfat
+sbin/mke2fs
+sbin/mkfs.ext*

@@ -1,0 +1,14 @@
+lib/mips64el-linux-gnuabi64/libtinfo.so.6*
+lib/mips64el-linux-gnuabi64/libtinfo.so.5*
+lib/mips64el-linux-gnuabi64/libfdisk.so.1*
+lib/mips64el-linux-gnuabi64/libsmartcols.so.1*
+lib/mips64el-linux-gnuabi64/libncursesw.so.6*
+lib/mips64el-linux-gnuabi64/libncursesw.so.5*
+lib/mips64el-linux-gnuabi64/libext2fs.so*
+lib/mips64el-linux-gnuabi64/libcom_err.so*
+lib/mips64el-linux-gnuabi64/libblkid.so*
+lib/mips64el-linux-gnuabi64/libuuid.so*
+lib/mips64el-linux-gnuabi64/libe2p.so*
+lib/mips64el-linux-gnuabi64/libdl.so*
+lib/mips64el-linux-gnuabi64/libc.so*
+lib/mips64el-linux-gnuabi64/libpthread.so*

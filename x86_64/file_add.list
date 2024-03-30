@@ -1,9 +1,3 @@
-lib/x86_64-linux-gnu/libtinfo.so.6*
-lib/x86_64-linux-gnu/libtinfo.so.5*
-lib/x86_64-linux-gnu/libfdisk.so.1*
-lib/x86_64-linux-gnu/libsmartcols.so.1*
-lib/x86_64-linux-gnu/libncursesw.so.6*
-lib/x86_64-linux-gnu/libncursesw.so.5*
 lib/x86_64-linux-gnu/libext2fs.so*
 lib/x86_64-linux-gnu/libcom_err.so*
 lib/x86_64-linux-gnu/libblkid.so*
@@ -12,3 +6,10 @@ lib/x86_64-linux-gnu/libe2p.so*
 lib/x86_64-linux-gnu/libdl.so*
 lib/x86_64-linux-gnu/libc.so*
 lib/x86_64-linux-gnu/libpthread.so*
+lib/x86_64-linux-gnu/libtinfo.so*
+lib/x86_64-linux-gnu/libfdisk.so*
+lib/x86_64-linux-gnu/libreadline.so*
+lib/x86_64-linux-gnu/libsmartcols.so*
+lib/x86_64-linux-gnu/libncursesw.so*
+lib/x86_64-linux-gnu/libefivar.so*
+lib/x86_64-linux-gnu/libefiboot.so*

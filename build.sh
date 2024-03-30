@@ -14,6 +14,14 @@ then
     apt-get -y install hdparm pv dosfstools debootstrap
 fi
 
+if [ "`uname -m`" != "mips64" ] ; then
+
+if ! [ -x /usr/bin/efibootmgr ] ; then
+  apt-get -y install efibootmgr
+fi
+
+fi
+
 cd initrd.tmp
 ker_ver=$(ls /lib/modules/)
 if [ "`echo $ker_ver |awk '{print $2}'`" ] ; then

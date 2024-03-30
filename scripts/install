@@ -326,7 +326,9 @@ cp /scripts/ghost.sh /2/usr/local/sbin
 umount -f /2/boot/efi >/dev/null 2>/dev/null
 umount -f /2/proc /2/dev /2/sys /2/boot >/dev/null 2>/dev/null
 umount -f /2 /1 >/dev/null 2>/dev/null
-
+echo 6. set uefi
+efibootmgr -L "debian" -B
+efibootmgr -c -d /dev/${dst_disk} -p 2 -L "debian" -l \EFI\debian\grubloongarch64.efi
 
 echo 9. ok!
 echo please reboot.
@@ -337,3 +339,4 @@ do
  sleep 3
 done
 poweroff
+exit

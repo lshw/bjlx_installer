@@ -343,8 +343,9 @@ case $m in
     if ! [ -e /2/boot/grubloongarch64.efi ] ; then
       cp /boot/grubloongarch64.efi /2/boot
     fi
-    efibootmgr -L "debian" -B
-    efibootmgr -c -d /dev/${dst_disk} -p 2 -L "debian" -l \\grubloongarch64.efi
+    hostname=$(cat /2/etc/hostname)
+    efibootmgr -L "$hostname" -B
+    efibootmgr -c -d /dev/${dst_disk} -p 1 -L "$hostname" -l \\grubloongarch64.efi
     chroot /2 update-grub >/dev/null 2>/dev/null
     chroot /2 grub-install /dev/${dst_disk} >/dev/null 2>/dev/null
    ;;

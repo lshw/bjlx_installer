@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 export TERM=linux
 if [ "a$1" == "a" ] ;then

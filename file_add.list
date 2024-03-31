@@ -2,6 +2,8 @@ usr/bin/pv
 usr/bin/lsblk
 usr/bin/zstd
 usr/sbin/debootstrap
+usr/sbin/partprobe
+bin/bash
 sbin/cfdisk
 sbin/sfdisk
 sbin/fdisk

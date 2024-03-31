@@ -11,9 +11,6 @@ fi
 exec 1>/dev/${tty}
 exec 2>/dev/${tty}
 clear
-echo tty >/dev/tty
-echo console >/dev/console
-ls /dev/sd*
 
 run_shell() {
 cd /
@@ -198,6 +195,7 @@ while ! [ -e /dev/$dst_disk ]
 do
   echo target disk $dst_disk not find!
   echo please insert $dst_disk
+  partprobe >/dev/null 2>/dev/null
   delay_disp
 done
 

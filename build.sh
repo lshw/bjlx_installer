@@ -6,12 +6,13 @@ if ! [ -x /sbin/hdparm ] \
     || ! [ -x /usr/bin/pv ] \
     || ! [ -x /usr/sbin/debootstrap ] \
     || ! [ -x /usr/sbin/mkfs.vfat ] \
+    || ! [ -x /usr/sbin/partprobe ] \
     || ! [ -x /usr/bin/unzstd ] \
-    || ! [ -x /usr/sbin/mkfs.vfat ]
+    || ! [ -x /usr/sbin/mkfs.ext4 ]
 then
     install_dev="y"
     apt update
-    apt-get -y install hdparm pv dosfstools debootstrap
+    apt-get -y install hdparm pv parted e2fsprogs dosfstools debootstrap
 fi
 
 if [ "`uname -m`" != "mips64" ] ; then

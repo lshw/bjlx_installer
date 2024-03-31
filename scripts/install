@@ -23,9 +23,10 @@ exit
 
 delay_disp() {
   for i in 5 4 3 2 1; do
-    echo $i >/dev/${tty}
+    echo -n " $i" >/dev/${tty}
     sleep 2
   done
+  echo >/dev/${tty}
 }
 
 zstd=9402075ea79ca9bb95dc2c7082656d9e
@@ -68,18 +69,7 @@ cd /
 umount /1 2>/dev/null
 mount ${dev} /1 >/dev/null 2>/dev/null
 
-if ! [ -s /scripts/reinstall ] ; then
-if [ -s  /1/install ] ; then
-cd /
-cp /1/install /sbin
-umount /1 2>/dev/null
-chmod 755 /sbin/install
-date >/scripts/reinstall
-/sbin/install
-exit
-fi #-s /1/install
-fi
- m=$( uname -m )
+m=$( uname -m )
 case $m  in
   x86_64)
     prefix="x86"
@@ -155,7 +145,7 @@ select=1
 else
 echo Please Select [1,2,3...,rescan,shell]:
 read select 
-if [ "a$select" == "a" ] || [ "$select" == "rescan" ]]
+if [ "a$select" == "a" ] || [ "$select" == "rescan" ]
 then
 echo Rescan...
 echo Please insert new  u-disk
@@ -279,9 +269,9 @@ echo "2. format /dev/${dst_disk}2 /root"
 mkfs.ext4 -L root /dev/${dst_disk}2 >/dev/null 2>/dev/null
 echo "3. format /dev/${dst_disk}3 swap"
 mkswap -L SWAP /dev/${dst_disk}3 >/dev/null 2>/dev/null
-mount -o barrier=1 -t ext4 /dev/${dst_disk}2 /2 >/dev/null 2>/dev/null
+mount -o sync -t ext4 /dev/${dst_disk}2 /2 >/dev/null 2>/dev/null
 mkdir -p /2/boot
-mount -t ext3 /dev/${dst_disk}1 /2/boot
+mount -o sync -t ext3 /dev/${dst_disk}1 /2/boot >/dev/null 2>/dev/null
 cd /2
 umount /1 2>/dev/null
 mount  ${dev} /1 >/dev/null 2>/dev/null
@@ -309,8 +299,10 @@ case $magic in
     gunzip=xz
     ;;
 esac
-
-pv /1/$file |$gunzip -dc|tar x -C /2
+cd /2
+pv /1/$file |$gunzip -dc|tar xv >/tmp/file.list
+cd /
+echo file count: $( wc /tmp/file.list | awk '{print $1}' )
 rm -f /2/etc/udev/rules.d/70-persistent-net.rules
 mount -t proc none /2/proc >/dev/null 2>/dev/null
 mount -t sysfs none /2/sys >/dev/null 2>/dev/null
@@ -352,8 +344,9 @@ esac
 if ! [ -e /2/usr/local/sbin/ghost.sh ] ; then
 cp /scripts/ghost.sh /2/usr/local/sbin
 fi
-sync
 cd /
+sync
+umount -f /sys/firmware/efi/efivars >/dev/null 2>/dev/null
 umount -f /2/proc /2/dev /2/sys /2/boot >/dev/null 2>/dev/null
 umount -f /2 /1 >/dev/null 2>/dev/null
 

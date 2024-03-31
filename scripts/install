@@ -326,6 +326,7 @@ chroot /2 /fix.sh
 fi
 
 echo 6. set bootload
+mount -t efivarfs none /sys/firmware/efi/efivars >/dev/null 2>/dev/null
 case $m in 
   x86_64)
     #efi todo
@@ -342,10 +343,9 @@ case $m in
       cp /boot/grubloongarch64.efi /2/boot
     fi
     hostname=$(cat /2/etc/hostname)
-    efibootmgr -L "$hostname" -B
-    efibootmgr -c -d /dev/${dst_disk} -p 1 -L "$hostname" -l \\grubloongarch64.efi
+    efibootmgr -L "$hostname" -B >/dev/null 2>/dev/null
+    efibootmgr -c -d /dev/${dst_disk} -p 1 -L "$hostname" -l \\grubloongarch64.efi >/dev/null 2>/dev/null
     chroot /2 update-grub >/dev/null 2>/dev/null
-    chroot /2 grub-install /dev/${dst_disk} >/dev/null 2>/dev/null
    ;;
 esac
 

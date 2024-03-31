@@ -60,6 +60,7 @@ sleep 4
 
 num=0
 rm -f /tmp/list.txt >/dev/null 2>/dev/null
+touch /tmp/list.txt
 for dev in  /dev/sd* 
 do
 

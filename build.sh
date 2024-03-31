@@ -34,17 +34,15 @@ done
 fi
 
 echo 展开 /boot/initrd.img-$ker_ver 到临时目录 initrd.tmp
-gz=xz
-pv /boot/initrd.img-$ker_ver |unxz 2>/dev/null |cpio -i  2>/dev/null
+gz="zstd -19"
+pv /boot/initrd.img-$ker_ver |xz -dc 2>/dev/null |cpio -i  2>/dev/null
 if [ $? != 0 ] ;then
-gz=lzma
 pv /boot/initrd.img-$ker_ver |lzma -dc 2>/dev/null |cpio -i 2>/dev/null
 if [ $? != 0 ] ;then
-gz=gzip
-pv /boot/initrd.img-$ker_ver |gunzip 2>/dev/null |cpio -i 2>/dev/null
+pv /boot/initrd.img-$ker_ver |zstd -dc 2>/dev/null |cpio -i 2>/dev/null
 if [ $? != 0 ] ;then
-gz="zstd -19"
-pv /boot/initrd.img-$ker_ver |unzstd 2>/dev/null |cpio -i 2>/dev/null
+gz=gzip
+pv /boot/initrd.img-$ker_ver |gzip -dc 2>/dev/null |cpio -i 2>/dev/null
 fi
 fi
 fi

@@ -1,4 +1,3 @@
-lib/modules/*
 lib/firmware
 bin/plymouth
 usr/share/plymouth

@@ -47,6 +47,7 @@ echo
 echo
 echo
 modprobe vfat 2>/dev/null
+modprobe nls_cp936 2>/dev/null
 modprobe nls_cp437 2>/dev/null
 modprobe nls_utf8 2>/dev/null
 modprobe ext4 2>/dev/null

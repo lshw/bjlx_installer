@@ -276,17 +276,13 @@ sfdisk --force /dev/${dst_disk}	<scripts/120G.txt >/dev/null 2>/dev/null
 sleep 3
 echo "1. format /dev/${dst_disk}1 /boot"
 mkfs.ext3 -L boot -F /dev/${dst_disk}1  >/dev/null 2>/dev/null
-echo "2. format /dev/${dst_disk}2 /boot/efi"
-mkfs.vfat -L EFI /dev/${dst_disk}2 >/dev/null 2>/dev/null
+echo "2. format /dev/${dst_disk}2 /root"
+mkfs.ext4 -L root /dev/${dst_disk}2 >/dev/null 2>/dev/null
 echo "3. format /dev/${dst_disk}3 swap"
 mkswap -L SWAP /dev/${dst_disk}3 >/dev/null 2>/dev/null
-echo "4. format /dev/${dst_disk}4 /"
-mkfs.ext4 -L root -F /dev/${dst_disk}4  >/dev/null 2>/dev/null
-mount -o barrier=0 -t ext4 /dev/${dst_disk}4 /2 >/dev/null 2>/dev/null
+mount -o barrier=0 -t ext4 /dev/${dst_disk}2 /2 >/dev/null 2>/dev/null
 mkdir -p /2/boot
 mount -t ext3 /dev/${dst_disk}1 /2/boot
-mkdir -p /2/boot/efi
-mount -t vfat /dev/${dst_disk}2 /2/boot/efi
 cd /2
 umount /1 2>/dev/null
 mount  ${dev} /1 >/dev/null 2>/dev/null
@@ -298,7 +294,7 @@ fi
 sleep 2
 cp /$mbr_bakfile /1
 
-echo 5. export $file to /dev/${dst_disk}4
+echo 5. export $file to /dev/${dst_disk}2
 magic=$( md5sum /scripts/${select}.magic |awk '{print $1}' )
 case $magic in
   $lzma)
@@ -331,27 +327,33 @@ chmod 777 /2/fix.sh
 chroot /2 /fix.sh
 fi
 
+echo 6. set bootload
 case $m in 
   x86_64)
+    #efi todo
+    chroot /2 update-grub >/dev/null 2>/dev/null
+    chroot /2 grub-install /dev/${dst_disk} >/dev/null 2>/dev/null
     ;;
   mips64)
     cp /scripts/boot.cfg /2/boot/boot.cfg
     cp /scripts/update-pmon /2/tmp
     chroot /2 /tmp/update-pmon
     ;;
-  *)
-chroot /2 update-grub >/dev/null 2>/dev/null
-chroot /2 grub-install /dev/${dst_disk} >/dev/null 2>/dev/null
-;;
+  loongarch64)
+    if ! [ -e /2/boot/grubloongarch64.efi ] ; then
+      cp /boot/grubloongarch64.efi /2/boot
+    fi
+    efibootmgr -L "debian" -B
+    efibootmgr -c -d /dev/${dst_disk} -p 2 -L "debian" -l \\grubloongarch64.efi
+    chroot /2 update-grub >/dev/null 2>/dev/null
+    chroot /2 grub-install /dev/${dst_disk} >/dev/null 2>/dev/null
+   ;;
 esac
 
 cp /scripts/ghost.sh /2/usr/local/sbin
 umount -f /2/boot/efi >/dev/null 2>/dev/null
 umount -f /2/proc /2/dev /2/sys /2/boot >/dev/null 2>/dev/null
 umount -f /2 /1 >/dev/null 2>/dev/null
-echo 6. set uefi
-efibootmgr -L "debian" -B
-efibootmgr -c -d /dev/${dst_disk} -p 2 -L "debian" -l \EFI\debian\grubloongarch64.efi
 
 echo 9. ok!
 echo please reboot.

@@ -1,28 +1,31 @@
 #!/bin/sh
 
 export TERM=linux
+clear
+if [ "a$1" == "a" ] ;then
+  tty=console
+  err=null
+else
+  tty=tty
+  err=tty
+fi
+exec 1>/dev/${tty}
+exec 2>/dev/${err}
+
 run_shell() {
 cd /
-umount /1  /2 2>/dev/null
+umount /1  /2 2>/dev/${err}
+exec 1>/dev/${tty}
+exec 2>/dev/${err}
 /bin/sh
 exit
 }
 
 delay_disp() {
-sleep 2
-echo 5
-sleep 2
-echo 4
-sleep 2
-echo 3
-sleep 2
-echo 2
-sleep 2
-echo 1
-sleep 2
-echo 0
-sleep 3
-return
+  for (( i=5; i>0; i-- )); do
+    echo $i >/dev/${tty}
+    sleep 2
+  done
 }
 
 zstd=9402075ea79ca9bb95dc2c7082656d9e
@@ -37,11 +40,6 @@ udevd -d >/dev/null 2>/dev/null
 sleep 3
 fi
 
-clear
-#if [ "a$1" == "a" ] ;then
-#exec 1>/dev/console
-#exec 2>/dev/console
-#fi
 
 echo
 echo

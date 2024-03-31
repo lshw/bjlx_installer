@@ -75,10 +75,10 @@ cp -a etc scripts make_initrd.sh initrd.tmp
 cd initrd.tmp
 echo "                      `date +%F\ %T`" > scripts/build_time
 mkdir -p lib/modules/$ker_ver/kernel
-find /lib/modules/$ker_ver -name  vfat.ko* -exec cp {} lib/modules/$ker_ver/kernel \;
-find /lib/modules/$ker_ver -name  nls_cp437.ko* -exec cp {} lib/modules/$ker_ver/kernel \;
-find /lib/modules/$ker_ver -name  nls_utf8.ko* -exec cp {} lib/modules/$ker_ver/kernel \;
-find /lib/modules/$ker_ver -name  ext4.ko* -exec cp {} lib/modules/$ker_ver/kernel \;
+while read mod
+do
+find /lib/modules/$ker_ver -name  mod* -exec cp {} lib/modules/$ker_ver/kernel \;
+done <modules.list
 chroot . depmod $ker_ver
 echo 打包为 install.img
 ./make_initrd.sh "$gz"

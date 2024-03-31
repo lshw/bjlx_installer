@@ -278,7 +278,7 @@ echo "2. format /dev/${dst_disk}2 /root"
 mkfs.ext4 -L root /dev/${dst_disk}2 >/dev/null 2>/dev/null
 echo "3. format /dev/${dst_disk}3 swap"
 mkswap -L SWAP /dev/${dst_disk}3 >/dev/null 2>/dev/null
-mount -o barrier=0 -t ext4 /dev/${dst_disk}2 /2 >/dev/null 2>/dev/null
+mount -o barrier=1 -t ext4 /dev/${dst_disk}2 /2 >/dev/null 2>/dev/null
 mkdir -p /2/boot
 mount -t ext3 /dev/${dst_disk}1 /2/boot
 cd /2
@@ -309,7 +309,7 @@ case $magic in
     ;;
 esac
 
- pv /1/$file |$gunzip -dc|tar x -C /2
+pv /1/$file |$gunzip -dc|tar x -C /2
 rm -f /2/etc/udev/rules.d/70-persistent-net.rules
 mount -t proc none /2/proc >/dev/null 2>/dev/null
 mount -t sysfs none /2/sys >/dev/null 2>/dev/null
@@ -348,15 +348,16 @@ case $m in
     chroot /2 update-grub >/dev/null 2>/dev/null
    ;;
 esac
-
+if ! [ -e /2/usr/local/sbin/ghost.sh ] ; then
 cp /scripts/ghost.sh /2/usr/local/sbin
-umount -f /2/boot/efi >/dev/null 2>/dev/null
+fi
+sync
+cd /
 umount -f /2/proc /2/dev /2/sys /2/boot >/dev/null 2>/dev/null
 umount -f /2 /1 >/dev/null 2>/dev/null
 
 echo 9. ok!
 echo please reboot.
-umount /2/dev /2/proc /2/sys 2>/dev/null
 
 while read select
 do

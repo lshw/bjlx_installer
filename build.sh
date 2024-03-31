@@ -83,6 +83,7 @@ chroot . depmod $ker_ver
 echo 打包为 install.img
 ./make_initrd.sh "$gz"
 cd ..
+cp install.img /boot
 mv install.img udisk
 cp /boot/vmlinu*$ker_ver udisk/vmlinuz
 cp boot.cfg udisk

@@ -18,4 +18,4 @@ mount -t sysfs none sys
 mount -t devtmpfs none dev
 fi
 trap umount_all EXIT
-chroot . /scripts/install
+chroot . /scripts/install sde

@@ -38,7 +38,10 @@ sleep 3
 fi
 
 clear
-#exec 2>/dev/null
+#if [ "a$1" == "a" ] ;then
+#exec 1>/dev/console
+#exec 2>/dev/console
+#fi
 
 echo
 echo
@@ -171,7 +174,9 @@ if [ "`grep sda /scripts/${select}.dev`" ] ; then
 dst_disk=sdb
 export dst_disk="$dst_disk"
 fi
-dst_disk=sde
+if [ "a$1" != "a" ] ; then
+dst_disk=$1
+fi
 export dst_disk=$dst_disk
 file=`cat /scripts/${select}.file`
 size=`cat /scripts/${select}.size`
@@ -184,6 +189,12 @@ cd /
 umount /1 2>/dev/null
 exit
 fi
+while ! [ -x /dev/$dst_disk ]
+do
+  echo target disk $dst_disk not find!
+  echo please insert $dst_disk
+  delay_disp
+done
 
 clear
 

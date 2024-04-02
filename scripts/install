@@ -16,8 +16,8 @@ run_shell() {
 cd /
 umount /1  /2 2>/dev/${err}
 exec 1>/dev/${tty}
-exec 2>/dev/${err}
-/bin/sh
+exec 2>/dev/${tty}
+/bin/bash
 exit
 }
 
@@ -46,10 +46,11 @@ echo
 echo
 echo
 modprobe vfat 2>/dev/null
-modprobe nls_cp936 2>/dev/null
-modprobe nls_cp437 2>/dev/null
-modprobe nls_utf8 2>/dev/null
-modprobe ext4 2>/dev/null
+find /lib/modules \( -name "vfat.ko" \
+-o -name "nls_cp936.ko" \
+-o -name "nls_cp437.ko" \
+-o -name "nls_utf8.ko" \
+-o -name "ext4.ko" \) -exec insmod {} \;
 
 for dev in /sys/block/sd*
 do
@@ -257,7 +258,7 @@ fi
 
 delay_disp
 
-mbr_bakfile=${dst_disk}.tab_bak`date +%Y%m%d%H%M%S`
+mbr_bakfile=${dst_disk}.tab_bak.`date +%Y%m%d%H%M%S`
 sfdisk -d /dev/${dst_disk} > /${mbr_bakfile}
 
 dd if=/dev/zero of=/dev/${dst_disk} count=1 bs=512 >/dev/null 2>/dev/null
@@ -347,7 +348,7 @@ cp /scripts/ghost.sh /2/usr/local/sbin
 fi
 cd /
 umount /1 >/dev/null 2>/dev/null
-mount /dev/${dst_disk}/2 /1
+mount /dev/${dst_disk}2 /1
 cp -a /2/boot/* /1/boot
 sync
 umount -f /sys/firmware/efi/efivars >/dev/null 2>/dev/null
@@ -357,6 +358,8 @@ umount -f /2 /1 >/dev/null 2>/dev/null
 echo 9. ok!
 df -h
 
+exec 1>/dev/${tty}
+exec 2>/dev/${tty}
 while read select
 do
  /bin/bash

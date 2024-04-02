@@ -79,6 +79,7 @@ do
   echo $mod
 find /lib/modules/$ker_ver -name ${mod}* -exec cp {} lib/modules/$ker_ver/kernel \;
 done <../modules.list
+find lib/modules/ -name "*.ko.zst" -exec unzstd -d -f --rm {} \;
 chroot . depmod $ker_ver
 echo 打包为 install.img
 ./make_initrd.sh "$gz"
@@ -86,6 +87,7 @@ cd ..
 cp install.img /boot
 mv install.img udisk
 cp /boot/vmlinu*$ker_ver udisk/vmlinuz
-cp boot.cfg udisk
+cp -a /boot/grub udisk
+grub-mkimage -o udisk/grubloongarch64.efi -p '(,gpt1)/grub' --prefix '(,gpt1)/grub' part_gpt part_msdos ntfs ext2 fat exfat -O loongarch64-efi
 ls -l udisk
 echo ok

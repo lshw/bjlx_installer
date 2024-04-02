@@ -264,7 +264,7 @@ dd if=/dev/zero of=/dev/${dst_disk} count=1 bs=512 >/dev/null 2>/dev/null
 sfdisk --force /dev/${dst_disk}	<scripts/120G.txt >/dev/null 2>/dev/null
 sleep 3
 echo "1. format /dev/${dst_disk}1 /boot"
-mkfs.ext3 -L boot -F /dev/${dst_disk}1  >/dev/null 2>/dev/null
+mkfs.ext3 -L boot /dev/${dst_disk}1  >/dev/null 2>/dev/null
 echo "2. format /dev/${dst_disk}2 /root"
 mkfs.ext4 -L root /dev/${dst_disk}2 >/dev/null 2>/dev/null
 echo "3. format /dev/${dst_disk}3 swap"
@@ -339,22 +339,27 @@ case $m in
     efibootmgr -L "$hostname" -B >/dev/null 2>/dev/null
     efibootmgr -c -d /dev/${dst_disk} -p 1 -L "$hostname" -l \\grubloongarch64.efi >/dev/null 2>/dev/null
     chroot /2 update-grub >/dev/null 2>/dev/null
+    chroot /2 install-grub /dev/${dst_disk} >/dev/null 2>/dev/null
    ;;
 esac
 if ! [ -e /2/usr/local/sbin/ghost.sh ] ; then
 cp /scripts/ghost.sh /2/usr/local/sbin
 fi
 cd /
+umount /1 >/dev/null 2>/dev/null
+mount /dev/${dst_disk}/2 /1
+cp -a /2/boot/* /1/boot
 sync
 umount -f /sys/firmware/efi/efivars >/dev/null 2>/dev/null
 umount -f /2/proc /2/dev /2/sys /2/boot >/dev/null 2>/dev/null
 umount -f /2 /1 >/dev/null 2>/dev/null
 
 echo 9. ok!
-echo please reboot.
+df -h
 
 while read select
 do
+ /bin/bash
  sleep 3
 done
 poweroff

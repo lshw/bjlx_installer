@@ -50,7 +50,7 @@ find /lib/modules \( -name "vfat.ko" \
 -o -name "nls_cp936.ko" \
 -o -name "nls_cp437.ko" \
 -o -name "nls_utf8.ko" \
--o -name "ext4.ko" \) -exec insmod {} \;
+-o -name "ext4.ko" \) -exec insmod {} \; >/dev/null 2>/dev/null
 
 for dev in /sys/block/sd*
 do

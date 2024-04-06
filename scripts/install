@@ -21,8 +21,9 @@ exec 2>/dev/${tty}
 }
 
 delay_disp() {
+  echo -n "6"
   for i in 5 4 3 2 1; do
-    echo -n " $i" >/dev/${tty}
+    echo -e -n "\x08$i" >/dev/${tty}
     sleep 2
   done
   echo >/dev/${tty}

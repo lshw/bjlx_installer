@@ -269,6 +269,7 @@ sfdisk -d /dev/${dst_disk} > /${mbr_bakfile}
 
 dd if=/dev/zero of=/dev/${dst_disk} count=1 bs=512 >/dev/null 2>/dev/null
 sfdisk --force /dev/${dst_disk}	<scripts/120G.txt >/dev/null 2>/dev/null
+partprobe 2>/dev/null
 sleep 3
 echo "1. format /dev/${dst_disk}1 /boot"
 mkfs.ext3 -L boot /dev/${dst_disk}1  >/dev/null 2>/dev/null

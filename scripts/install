@@ -348,6 +348,12 @@ case $m in
     efibootmgr -c -d /dev/${dst_disk} -p 1 -L "$hostname" -l \\grubloongarch64.efi >/dev/null 2>/dev/null
     chroot /2 update-grub >/dev/null 2>/dev/null
     chroot /2 install-grub /dev/${dst_disk} >/dev/null 2>/dev/null
+    if ! [ -x /2/home/loongson ] ; then
+      if [ "a`grep ^loongson /2/etc/passwd`" != "a" ] ; then
+	chroot /2 mkdir -p /home/loongson
+	chroot /2 chown loongson:loongson /home/loongson
+      fi
+    fi
    ;;
 esac
 if ! [ -e /2/usr/local/sbin/ghost.sh ] ; then
@@ -356,7 +362,7 @@ fi
 cd /
 umount /1 >/dev/null 2>/dev/null
 mount /dev/${dst_disk}2 /1
-cp -a /2/boot/* /1/boot
+cp -a /2/boot/* /1/boot 2>/dev/null
 sync
 umount -f /sys/firmware/efi/efivars >/dev/null 2>/dev/null
 umount -f /2/proc /2/dev /2/sys /2/boot >/dev/null 2>/dev/null

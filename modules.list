@@ -1,5 +1,11 @@
-nls_cp936.ko
-nls_cp437.ko
-nls_utf8.ko
 ext4.ko
+Module.ko
+nls_cp437.ko
+nls_cp936.ko
+nls_utf8.ko
+sg.ko
+usbhid.ko
+usb_storage.ko
 vfat.ko
+xhci_pci.ko
+xhci_pci_renesas.ko

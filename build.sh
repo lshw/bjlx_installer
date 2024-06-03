@@ -74,6 +74,9 @@ cp -a etc boot scripts make_initrd.sh initrd.tmp
 cd initrd.tmp
 echo "                      `date +%F\ %T`" > scripts/build_time
 mkdir -p lib/modules/$ker_ver/kernel
+lsmod |awk '{print $1".ko"}' >> ../modules.list
+sort ../modules.list |uniq > ../modules.txt
+mv ../modules.txt ../modules.list
 while read mod
 do
   echo $mod

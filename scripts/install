@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export TERM=linux
-if [ "a$1" == "a" ] ;then
+if [ "a$1" == "a" ]; then
   tty=console
   err=null
 else
@@ -13,11 +13,11 @@ exec 2>/dev/${tty}
 clear
 
 run_shell() {
-cd /
-umount /1  /2 2>/dev/${err}
-exec 1>/dev/${tty}
-exec 2>/dev/${tty}
-/bin/bash
+  cd /
+  umount /1 /2 2>/dev/${err}
+  exec 1>/dev/${tty}
+  exec 2>/dev/${tty}
+  /bin/bash
 }
 
 delay_disp() {
@@ -36,25 +36,23 @@ lzma=316d74ab46ce480017d6db2d43358db4
 ansi_red="\x1b[31m"
 ansi_w="\x1b[0m"
 mkdir -p /1 /2
-if ! [ -s /scripts/reinstall ] ; then
-udevd -d >/dev/null 2>/dev/null
-sleep 3
+if ! [ -s /scripts/reinstall ]; then
+  udevd -d >/dev/null 2>/dev/null
+  sleep 3
 fi
-
 
 echo
 echo
 echo
 modprobe vfat 2>/dev/null
 find /lib/modules \( -name "vfat.ko" \
--o -name "nls_cp936.ko" \
--o -name "nls_cp437.ko" \
--o -name "nls_utf8.ko" \
--o -name "ext4.ko" \) -exec insmod {} \; >/dev/null 2>/dev/null
+  -o -name "nls_cp936.ko" \
+  -o -name "nls_cp437.ko" \
+  -o -name "nls_utf8.ko" \
+  -o -name "ext4.ko" \) -exec insmod {} \; >/dev/null 2>/dev/null
 
-for dev in /sys/block/sd*
-do
- echo "add" > ${dev}/uevent
+for dev in /sys/block/sd*; do
+  echo "add" >${dev}/uevent
 done
 
 echo Scaning....
@@ -63,15 +61,14 @@ sleep 4
 num=0
 rm -f /tmp/list.txt >/dev/null 2>/dev/null
 touch /tmp/list.txt
-for dev in  /dev/sd* 
-do
+for dev in /dev/sd*; do
 
-cd /
-umount /1 2>/dev/null
-mount ${dev} /1 >/dev/null 2>/dev/null
+  cd /
+  umount /1 2>/dev/null
+  mount ${dev} /1 >/dev/null 2>/dev/null
 
-m=$( uname -m )
-case $m  in
+  m=$(uname -m)
+  case $m in
   x86_64)
     prefix="x86"
     ;;
@@ -81,36 +78,50 @@ case $m  in
   *)
     prefix=$m
     ;;
-esac
-dst_disk="sda"
-export dst_disk="$dst_disk"
+  esac
+  dst_disk="sda"
+  export dst_disk="$dst_disk"
 
-cd /1
-for fname in ${prefix}*_20*.tar.*
-do
-if  [ "$fname" == "${prefix}*_20*.tar.*" ] ; then
- break;
-fi
-if [ "`echo $fname |grep patch`" ] ; then
- continue;
-fi
+  echo The default device for Linux installation is /dev/sda. Do you want to use it? [yes/No]:
+  read use_default
 
-num=$(( $num + 1 ))
-dd if=/1/$fname count=2 bs=1 of=/scripts/${num}.magic >/dev/null 2>/dev/null
-if [ "a`md5sum /scripts/${num}.magic |grep -v -e $zstd -e $xz -e $gz -e $lzma`" != "a" ] ; then
-     echo skip $fname
-   num=$(( $num - 1 ))
- else
-   echo ok $fname
-fi
+  if [ "$use_default" != "yes" ]; then
+    echo Please enter the device name [e.g., sda, nvme0n1]:
+    lsblk
+    read dst_disk
+    if ! [ -e /dev/$dst_disk ]; then
+      echo target disk $dst_disk not find!
+      run_shell
+      exit
+    fi
+    export dst_disk="$dst_disk"
+  fi
 
-size=`ls -kl /1/$fname  |awk '{ printf int($5/1000000+0.5)"M"}'`
-echo $size >/scripts/${num}.size
-echo -e "$num\t${dev}\t$fname\t$size" >>/tmp/list.txt
-echo $dev >/scripts/${num}.dev
-echo $fname >/scripts/${num}.file
-done #for fname in loongson*_20*.tar.*
-done #for dev in  /dev/sd* /dev/ub* /dev/cdrom*
+  cd /1
+  for fname in ${prefix}*_20*.tar.*; do
+    if [ "$fname" == "${prefix}*_20*.tar.*" ]; then
+      break
+    fi
+    if [ "$(echo $fname | grep patch)" ]; then
+      continue
+    fi
+
+    num=$(($num + 1))
+    dd if=/1/$fname count=2 bs=1 of=/scripts/${num}.magic >/dev/null 2>/dev/null
+    if [ "a$(md5sum /scripts/${num}.magic | grep -v -e $zstd -e $xz -e $gz -e $lzma)" != "a" ]; then
+      echo skip $fname
+      num=$(($num - 1))
+    else
+      echo ok $fname
+    fi
+
+    size=$(ls -kl /1/$fname | awk '{ printf int($5/1000000+0.5)"M"}')
+    echo $size >/scripts/${num}.size
+    echo -e "$num\t${dev}\t$fname\t$size" >>/tmp/list.txt
+    echo $dev >/scripts/${num}.dev
+    echo $fname >/scripts/${num}.file
+  done #for fname in loongson*_20*.tar.*
+done   #for dev in  /dev/sd* /dev/ub* /dev/cdrom*
 clear
 echo ========================================================= >/dev/$tty
 cat /tmp/list.txt >/dev/$tty
@@ -118,78 +129,72 @@ echo ========================================================= >/dev/$tty
 cd /
 rm -f /tmp/list.txt
 umount /1 2>/dev/null
-if [ "${num}" == "0" ] ;then
-echo tar package file not find ... >/dev/$tty
-echo rescan or shell? [Enter] >/dev/$tty
-read rescan
-case "$rescan" in 
-	shell)
-	run_shell
-	exit
-	;;
-	no)
-	  while [ 1 ]
-	  do
-	    run_shell
-          done
-	;;
-	*)
-	echo insert new u-disk, please.
-	echo rescan >/scripts/reinstall
-	delay_disp
-	cd /
-	umount /1 2>/dev/null
-	exit
-	;;
-esac	
-fi # $num=0 
+if [ "${num}" == "0" ]; then
+  echo tar package file not find ... >/dev/$tty
+  echo rescan or shell? [Enter] >/dev/$tty
+  read rescan
+  case "$rescan" in
+  shell)
+    run_shell
+    exit
+    ;;
+  no)
+    while [ 1 ]; do
+      run_shell
+    done
+    ;;
+  *)
+    echo insert new u-disk, please.
+    echo rescan >/scripts/reinstall
+    delay_disp
+    cd /
+    umount /1 2>/dev/null
+    exit
+    ;;
+  esac
+fi # $num=0
 
-if [ "$num" == "1" ]
-then 
-select=1
+if [ "$num" == "1" ]; then
+  select=1
 else
-echo Please Select [1,2,3...,rescan,shell]:
-read select 
-if [ "a$select" == "a" ] || [ "$select" == "rescan" ]
-then
-echo Rescan...
-echo Please insert new  u-disk
-echo rescan >/scripts/reinstall
-delay_disp
-cd /
-umount /1 2>/dev/null
-exit
+  echo Please Select [1,2,3...,rescan,shell]:
+  read select
+  if [ "a$select" == "a" ] || [ "$select" == "rescan" ]; then
+    echo Rescan...
+    echo Please insert new u-disk
+    echo rescan >/scripts/reinstall
+    delay_disp
+    cd /
+    umount /1 2>/dev/null
+    exit
+  fi
+  if [ "$select" == "shell" ]; then
+    run_shell
+    exit
+  fi
 fi
-if [ "$select" == "shell" ]
-then
-run_shell
-exit
-fi
-fi
-if [ -e /scripts/${select}.dev ]
-then
-dev=`cat /scripts/${select}.dev`
-if [ "`grep sda /scripts/${select}.dev`" ] ; then
-dst_disk=sdb
-export dst_disk="$dst_disk"
-fi
-if [ "a$1" != "a" ] ; then
-dst_disk=$1
-fi
-export dst_disk=$dst_disk
-file=`cat /scripts/${select}.file`
-size=`cat /scripts/${select}.size`
+if [ -e /scripts/${select}.dev ]; then
+  dev=$(cat /scripts/${select}.dev)
+  if [ "$(grep sda /scripts/${select}.dev)" ]; then
+    dst_disk=sdb
+    export dst_disk="$dst_disk"
+  fi
+  if [ "a$1" != "a" ]; then
+    dst_disk=$1
+  fi
+  export dst_disk=$dst_disk
+  file=$(cat /scripts/${select}.file)
+  size=$(cat /scripts/${select}.size)
 else
-echo rescan >/scripts/reinstall
-echo Rescan...
-echo Please insert new  u-disk
-delay_disp
-cd /
-umount /1 2>/dev/null
-exit
+  echo rescan >/scripts/reinstall
+  echo Rescan...
+  echo Please insert new u-disk
+  delay_disp
+  cd /
+  umount /1 2>/dev/null
+  exit
 fi
-while ! [ -e /dev/$dst_disk ]
-do
+while ! [ -e /dev/$dst_disk ]; do
   echo target disk $dst_disk not find!
   echo please insert $dst_disk
   partprobe >/dev/null 2>/dev/null
@@ -203,46 +208,41 @@ cat /scripts/build_time
 echo =========================================================
 echo $dev $file $size
 echo =========================================================
-echo disk /dev/${dst_disk} All data will delete!   continue? [yes/No/rescan/shell]
+echo disk /dev/${dst_disk} All data will delete! continue? [yes/No/rescan/shell]
 read seta
-if [ "$seta" == "shell" ]
-then
-run_shell
-exit
+if [ "$seta" == "shell" ]; then
+  run_shell
+  exit
 fi
-if [ "$seta" == "rescan" ]
-then
-echo rescan >/scripts/reinstall
-echo Rescan...
-echo Please insert new  u-disk
-delay_disp
-cd /
-umount /1 2>/dev/null
-exit
+if [ "$seta" == "rescan" ]; then
+  echo rescan >/scripts/reinstall
+  echo Rescan...
+  echo Please insert new u-disk
+  delay_disp
+  cd /
+  umount /1 2>/dev/null
+  exit
 fi
 
-if [ "a$seta" == "a" ]
-then
-echo rescan >/scripts/reinstall
-echo Rescan...
-echo Please insert new  u-disk
-delay_disp
-cd /
-umount /1  2>/dev/null
-exit
+if [ "a$seta" == "a" ]; then
+  echo rescan >/scripts/reinstall
+  echo Rescan...
+  echo Please insert new u-disk
+  delay_disp
+  cd /
+  umount /1 2>/dev/null
+  exit
 fi
 
-if [ "${seta}" != "yes" ]
-then
-  while [ 1 ]
-  do
+if [ "${seta}" != "yes" ]; then
+  while [ 1 ]; do
     run_shell
   done
 fi
 
 echo
 echo =========================================================
-hdparm -i /dev/${dst_disk} |grep Model
+hdparm -i /dev/${dst_disk} | grep Model
 echo =========================================================
 lsblk /dev/${dst_disk}
 echo =========================================================
@@ -251,118 +251,125 @@ echo DISK /dev/${dst_disk}*
 echo -e "${ansi_red}ALL DATA WILL DELETE!!!${ansi_w}"
 echo continue? [yes/No]
 read seta
-if [ "$seta" != "yes" ] ;then
-echo No! Poweroff...
-sleep 5
-while [ 1 ]
-do
-poweroff
-sleep 10
-done
+if [ "$seta" != "yes" ]; then
+  echo No! Poweroff...
+  sleep 5
+  while [ 1 ]; do
+    poweroff
+    sleep 10
+  done
 
-return
+  return
 fi
 
 delay_disp
 
-mbr_bakfile=${dst_disk}.tab_bak.`date +%Y%m%d%H%M%S`
-sfdisk -d /dev/${dst_disk} > /${mbr_bakfile}
+mbr_bakfile=${dst_disk}.tab_bak.$(date +%Y%m%d%H%M%S)
+sfdisk -d /dev/${dst_disk} >/${mbr_bakfile}
 
 dd if=/dev/zero of=/dev/${dst_disk} count=1 bs=512 >/dev/null 2>/dev/null
-sfdisk --force /dev/${dst_disk}	<scripts/120G.txt >/dev/null 2>/dev/null
+sfdisk --force /dev/${dst_disk} <scripts/120G.txt >/dev/null 2>/dev/null
 partprobe 2>/dev/null
 sleep 3
-echo "1. format /dev/${dst_disk}1 /boot"
-mkfs.ext3 -L boot /dev/${dst_disk}1  >/dev/null 2>/dev/null
-echo "2. format /dev/${dst_disk}2 /root"
-mkfs.ext4 -L root /dev/${dst_disk}2 >/dev/null 2>/dev/null
-echo "3. format /dev/${dst_disk}3 swap"
-mkswap -L SWAP /dev/${dst_disk}3 >/dev/null 2>/dev/null
-mount -o sync -t ext4 /dev/${dst_disk}2 /2 >/dev/null 2>/dev/null
+case $dst_disk in
+nvme*)
+  partition_prefix="p"
+  ;;
+*)
+  partition_prefix=""
+  ;;
+esac
+echo "1. format /dev/${dst_disk}${partition_prefix}1 /boot"
+mkfs.ext3 -L boot /dev/${dst_disk}${partition_prefix}1 >/dev/null 2>/dev/null
+echo "2. format /dev/${dst_disk}${partition_prefix}2 /root"
+mkfs.ext4 -L root /dev/${dst_disk}${partition_prefix}2 >/dev/null 2>/dev/null
+echo "3. format /dev/${dst_disk}${partition_prefix}3 swap"
+mkswap -L SWAP /dev/${dst_disk}${partition_prefix}3 >/dev/null 2>/dev/null
+mount -o sync -t ext4 /dev/${dst_disk}${partition_prefix}2 /2 >/dev/null 2>/dev/null
 mkdir -p /2/boot
-mount -o sync -t ext3 /dev/${dst_disk}1 /2/boot >/dev/null 2>/dev/null
+mount -o sync -t ext3 /dev/${dst_disk}${partition_prefix}1 /2/boot >/dev/null 2>/dev/null
 cd /2
 umount /1 2>/dev/null
-mount  ${dev} /1 >/dev/null 2>/dev/null
-if [ $? != 0 ] ; then
- umount /1 >/dev/null 2>/dev/null
- fsck -y ${dev} >/dev/null 2>/dev/null
- mount  ${dev} /1 >/dev/null 2>/dev/null
-fi	
+mount ${dev} /1 >/dev/null 2>/dev/null
+if [ $? != 0 ]; then
+  umount /1 >/dev/null 2>/dev/null
+  fsck -y ${dev} >/dev/null 2>/dev/null
+  mount ${dev} /1 >/dev/null 2>/dev/null
+fi
 sleep 2
 cp /$mbr_bakfile /1
 
-echo 5. export $file to /dev/${dst_disk}2
-magic=$( md5sum /scripts/${select}.magic |awk '{print $1}' )
+echo 5. export $file to /dev/${dst_disk}${partition_prefix}2
+magic=$(md5sum /scripts/${select}.magic | awk '{print $1}')
 case $magic in
-  $lzma)
-    gunzip=lzma
-    ;;
-  $gz)
-    gunzip=gzip
-    ;;
-  $zstd)
-    gunzip=zstd
-    ;;
-  $xz)
-    gunzip=xz
-    ;;
+$lzma)
+  gunzip=lzma
+  ;;
+$gz)
+  gunzip=gzip
+  ;;
+$zstd)
+  gunzip=zstd
+  ;;
+$xz)
+  gunzip=xz
+  ;;
 esac
 cd /2
-pv /1/$file |$gunzip -dc|tar xv >/tmp/file.list
+pv /1/$file | $gunzip -dc | tar xv >/tmp/file.list
 cd /
-echo file count: $( wc /tmp/file.list | awk '{print $1}' )
+echo file count: $(wc /tmp/file.list | awk '{print $1}')
 rm -f /2/etc/udev/rules.d/70-persistent-net.rules
 mount -t proc none /2/proc >/dev/null 2>/dev/null
 mount -t sysfs none /2/sys >/dev/null 2>/dev/null
 mount -t devtmpfs none /2/dev >/dev/null 2>/dev/null
 cp /scripts/fstab /2/etc
 
-if [ -e /2/tmp/fix.sh ] ;then
-chmod 777 /2/tmp/fix.sh
-chroot /2 /tmp/fix.sh
+if [ -e /2/tmp/fix.sh ]; then
+  chmod 777 /2/tmp/fix.sh
+  chroot /2 /tmp/fix.sh
 fi
-if [ -e /2/fix.sh ] ;then
-chmod 777 /2/fix.sh
-chroot /2 /fix.sh
+if [ -e /2/fix.sh ]; then
+  chmod 777 /2/fix.sh
+  chroot /2 /fix.sh
 fi
 
 echo 6. set bootload
 mount -t efivarfs none /sys/firmware/efi/efivars >/dev/null 2>/dev/null
-case $m in 
-  x86_64)
-    #efi todo
-    chroot /2 update-grub >/dev/null 2>/dev/null
-    chroot /2 grub-install /dev/${dst_disk} >/dev/null 2>/dev/null
-    ;;
-  mips64)
-    cp /scripts/boot.cfg /2/boot/boot.cfg
-    cp /scripts/update-pmon /2/tmp
-    chroot /2 /tmp/update-pmon
-    ;;
-  loongarch64)
-    if ! [ -e /2/boot/grubloongarch64.efi ] ; then
-      cp /boot/grubloongarch64.efi /2/boot
+case $m in
+x86_64)
+  #efi todo
+  chroot /2 update-grub >/dev/null 2>/dev/null
+  chroot /2 grub-install /dev/${dst_disk} >/dev/null 2>/dev/null
+  ;;
+mips64)
+  cp /scripts/boot.cfg /2/boot/boot.cfg
+  cp /scripts/update-pmon /2/tmp
+  chroot /2 /tmp/update-pmon
+  ;;
+loongarch64)
+  if ! [ -e /2/boot/grubloongarch64.efi ]; then
+    cp /boot/grubloongarch64.efi /2/boot
+  fi
+  hostname=$(cat /2/etc/hostname)
+  efibootmgr -L "$hostname" -B >/dev/null 2>/dev/null
+  efibootmgr -c -d /dev/${dst_disk} -p 1 -L "$hostname" -l \\grubloongarch64.efi >/dev/null 2>/dev/null
+  chroot /2 update-grub >/dev/null 2>/dev/null
+  chroot /2 install-grub /dev/${dst_disk} >/dev/null 2>/dev/null
+  if ! [ -x /2/home/loongson ]; then
+    if [ "a$(grep ^loongson /2/etc/passwd)" != "a" ]; then
+      chroot /2 mkdir -p /home/loongson
+      chroot /2 chown loongson:loongson /home/loongson
     fi
-    hostname=$(cat /2/etc/hostname)
-    efibootmgr -L "$hostname" -B >/dev/null 2>/dev/null
-    efibootmgr -c -d /dev/${dst_disk} -p 1 -L "$hostname" -l \\grubloongarch64.efi >/dev/null 2>/dev/null
-    chroot /2 update-grub >/dev/null 2>/dev/null
-    chroot /2 install-grub /dev/${dst_disk} >/dev/null 2>/dev/null
-    if ! [ -x /2/home/loongson ] ; then
-      if [ "a`grep ^loongson /2/etc/passwd`" != "a" ] ; then
-	chroot /2 mkdir -p /home/loongson
-	chroot /2 chown loongson:loongson /home/loongson
-      fi
-    fi
-   ;;
+  fi
+  ;;
 esac
-if ! [ -e /2/usr/local/sbin/ghost.sh ] ; then
-cp /scripts/ghost.sh /2/usr/local/sbin
+if ! [ -e /2/usr/local/sbin/ghost.sh ]; then
+  cp /scripts/ghost.sh /2/usr/local/sbin
 fi
 cd /
 umount /1 >/dev/null 2>/dev/null
-mount /dev/${dst_disk}2 /1
+mount /dev/${dst_disk}${partition_prefix}2 /1
 cp -a /2/boot/* /1/boot 2>/dev/null
 sync
 umount -f /sys/firmware/efi/efivars >/dev/null 2>/dev/null
@@ -374,8 +381,7 @@ df -h
 
 exec 1>/dev/${tty}
 exec 2>/dev/${tty}
-while read select
-do
+while read select; do
   run_shell
 done
 exit

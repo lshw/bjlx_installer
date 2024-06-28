@@ -12,7 +12,7 @@ if ! [ -x /sbin/hdparm ] \
 then
     install_dev="y"
     apt update
-    apt-get -y install hdparm pv parted e2fsprogs dosfstools debootstrap
+    apt-get -y install hdparm pv parted e2fsprogs dosfstools debootstrap zstd
 fi
 
 if [ "`uname -m`" != "mips64" ] ; then

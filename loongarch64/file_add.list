@@ -14,3 +14,7 @@ lib/loongarch64-linux-gnu/libncursesw.so*
 lib/loongarch64-linux-gnu/libefivar.so*
 lib/loongarch64-linux-gnu/libefiboot.so*
 lib/loongarch64-linux-gnu/libparted.so*
+lib/loongarch64-linux-gnu/liblzma.so*
+lib/loongarch64-linux-gnu/liblz4.so*
+lib/loongarch64-linux-gnu/libz.so*
+

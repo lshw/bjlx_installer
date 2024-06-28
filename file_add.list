@@ -22,5 +22,5 @@ sbin/fsck.msdos
 sbin/fsck.vfat
 sbin/mke2fs
 sbin/mkfs.ext*
-sbin/mkfs.vfat
+usr/sbin/mkfs.vfat
 usr/bin/efibootmgr

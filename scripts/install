@@ -268,7 +268,11 @@ mbr_bakfile=${dst_disk}.tab_bak.$(date +%Y%m%d%H%M%S)
 sfdisk -d /dev/${dst_disk} >/${mbr_bakfile}
 
 dd if=/dev/zero of=/dev/${dst_disk} count=1 bs=512 >/dev/null 2>/dev/null
-sfdisk --force /dev/${dst_disk} <scripts/120G.txt >/dev/null 2>/dev/null
+if [ $( sfdisk -s /dev/${dst_disk} ) -gt 60000000 ] ; then
+ sfdisk --force /dev/${dst_disk} <scripts/120G.txt >/dev/null 2>/dev/null
+else
+ sfdisk --force /dev/${dst_disk} <scripts/16G.txt >/dev/null 2>/dev/null
+fi
 partprobe 2>/dev/null
 sleep 3
 case $dst_disk in

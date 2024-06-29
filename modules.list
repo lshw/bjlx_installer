@@ -23,11 +23,13 @@ scsi_mod.ko
 sd_mod.ko
 sg.ko
 uas.ko
+ufs.ko
 usb_common.ko
 usbcore.ko
 usbhid.ko
 usb_storage.ko
 vfat.ko
+xfs.ko
 xhci_pci.ko
 xhci_pci_renesas.ko
 zstd.ko

@@ -93,5 +93,6 @@ cp /boot/vmlinu*$ker_ver udisk/vmlinuz
 cp -a readme.html /boot/grub udisk
 cp grub.cfg udisk/grub
 grub-mkimage -o udisk/grubloongarch64.efi -p '(,gpt1)/grub' --prefix '(,gpt1)/grub' part_gpt part_msdos ntfs ext2 fat exfat -O loongarch64-efi
+cp udisk/grubloongarch64.efi udisk/install
 ls -l udisk
 echo ok

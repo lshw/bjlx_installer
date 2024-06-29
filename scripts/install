@@ -82,21 +82,6 @@ for dev in /dev/sd* /dev/nvme*; do
   dst_disk="sda"
   export dst_disk="$dst_disk"
 
-  echo The default device for Linux installation is /dev/sda. Do you want to use it? [yes/No]:
-  read use_default
-
-  if [ "$use_default" != "yes" ]; then
-    echo Please enter the device name [e.g., sda, nvme0n1]:
-    lsblk
-    read dst_disk
-    if ! [ -e /dev/$dst_disk ]; then
-      echo target disk $dst_disk not find!
-      run_shell
-      exit
-    fi
-    export dst_disk="$dst_disk"
-  fi
-
   cd /1
   for fname in ${prefix}*_20*.tar.*; do
     if [ "$fname" == "${prefix}*_20*.tar.*" ]; then
@@ -194,6 +179,21 @@ else
   umount /1 2>/dev/null
   exit
 fi
+
+echo The device for Linux installation is /dev/sda. Do you want to use it? [yes/No]:
+read use_default
+
+if [ "$use_default" != "yes" ]; then
+  echo Please enter the device name [e.g., sda, nvme0]:
+  src_dev=$( basename $dev |sed 's/[0-9]*$//g' |sed 's/p$//g' )
+  lsblk -o NAME,TYPE,FSTYPE,SIZE,FSUSE%,LABEL |grep -v $src_dev
+  read dst_disk0
+  if  [ $dst_disk0 ] && [ $dst_disk0 != $src_dev ] ; then
+    dst_disk=$dst_disk0
+  fi
+  export dst_disk="$dst_disk"
+fi
+
 while ! [ -e /dev/$dst_disk ]; do
   echo target disk $dst_disk not find!
   echo please insert $dst_disk
@@ -244,7 +244,7 @@ echo
 echo =========================================================
 hdparm -i /dev/${dst_disk} | grep Model
 echo =========================================================
-lsblk /dev/${dst_disk}
+lsblk -o NAME,TYPE,FSTYPE,SIZE,FSUSE%,LABEL /dev/${dst_disk}
 echo =========================================================
 
 echo DISK /dev/${dst_disk}*
@@ -324,9 +324,10 @@ pv /1/$file | $gunzip -dc | tar xv >/tmp/file.list
 cd /
 echo file count: $(wc /tmp/file.list | awk '{print $1}')
 rm -f /2/etc/udev/rules.d/70-persistent-net.rules
-mount -t proc none /2/proc >/dev/null 2>/dev/null
-mount -t sysfs none /2/sys >/dev/null 2>/dev/null
-mount -t devtmpfs none /2/dev >/dev/null 2>/dev/null
+mount --bind /proc /2/proc >/dev/null 2>/dev/null
+mount --bind /sys /2/sys >/dev/null 2>/dev/null
+mount --bind /dev /2/dev >/dev/null 2>/dev/null
+mount --bind /dev/pts /2/dev/pts >/dev/null 2>/dev/null
 cp /scripts/fstab /2/etc
 
 if [ -e /2/tmp/fix.sh ]; then

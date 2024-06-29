@@ -51,7 +51,7 @@ find /lib/modules \( -name "vfat.ko" \
   -o -name "nls_utf8.ko" \
   -o -name "ext4.ko" \) -exec insmod {} \; >/dev/null 2>/dev/null
 
-for dev in /sys/block/sd*; do
+for dev in /sys/block/*; do
   echo "add" >${dev}/uevent
 done
 
@@ -61,7 +61,7 @@ sleep 4
 num=0
 rm -f /tmp/list.txt >/dev/null 2>/dev/null
 touch /tmp/list.txt
-for dev in /dev/sd*; do
+for dev in /dev/sd* /dev/nvme*; do
 
   cd /
   umount /1 2>/dev/null

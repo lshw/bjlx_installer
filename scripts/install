@@ -341,11 +341,12 @@ fi
 
 echo 6. set bootload
 mount -t efivarfs none /sys/firmware/efi/efivars >/dev/null 2>/dev/null
+mount -t efivarfs none /2/sys/firmware/efi/efivars >/dev/null 2>/dev/null
 case $m in
 x86_64)
   #efi todo
   chroot /2 update-grub >/dev/null 2>/dev/null
-  chroot /2 grub-install /dev/${dst_disk} >/dev/null 2>/dev/null
+  chroot /2 grub-install --efi-directory=/boot --force /dev/${dst_disk} >/dev/null 2>/dev/null
   ;;
 mips64)
   cp /scripts/boot.cfg /2/boot/boot.cfg
@@ -357,10 +358,14 @@ loongarch64)
     cp /boot/grubloongarch64.efi /2/boot
   fi
   hostname=$(cat /2/etc/hostname)
-  efibootmgr -L "$hostname" -B >/dev/null 2>/dev/null
-  efibootmgr -c -d /dev/${dst_disk} -p 1 -L "$hostname" -l \\grubloongarch64.efi >/dev/null 2>/dev/null
   chroot /2 update-grub >/dev/null 2>/dev/null
-  chroot /2 install-grub /dev/${dst_disk} >/dev/null 2>/dev/null
+  chroot /2 grub-install --efi-directory=/boot --force /dev/${dst_disk} >/dev/null 2>/dev/null
+  
+  #efibootmgr -L "$hostname" -B >/dev/null 2>/dev/null
+  #efibootmgr -c -d /dev/${dst_disk} -p 1 -L "$hostname" -l \\EFI\\debian\\grubloongarch64.efi >/dev/null 2>/dev/null
+  #bootnum=$( efibootmgr |grep $hostname |tr -d 'Boot*' |awk '{printf $1}' )
+  #echo install efi Boot$bootnum $hostname
+  #efibootmgr -a -b $bootnum
   if ! [ -x /2/home/loongson ]; then
     if [ "a$(grep ^loongson /2/etc/passwd)" != "a" ]; then
       chroot /2 mkdir -p /home/loongson
@@ -378,6 +383,7 @@ mount /dev/${dst_disk}${partition_prefix}2 /1
 cp -a /2/boot/* /1/boot 2>/dev/null
 sync
 umount -f /sys/firmware/efi/efivars >/dev/null 2>/dev/null
+umount -f /2/sys/firmware/efi/efivars /2/dev/pts >/dev/null 2>/dev/null
 umount -f /2/proc /2/dev /2/sys /2/boot >/dev/null 2>/dev/null
 umount -f /2 /1 >/dev/null 2>/dev/null
 

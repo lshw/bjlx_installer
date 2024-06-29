@@ -34,6 +34,7 @@ gz=5b25786f919872ca265a821a845567c0
 xz=a911b981b57c7ff4459151d00c7a42e9
 lzma=316d74ab46ce480017d6db2d43358db4
 ansi_red="\x1b[31m"
+ansi_shan="\x1b[5m"
 ansi_w="\x1b[0m"
 mkdir -p /1 /2
 if ! [ -s /scripts/reinstall ]; then
@@ -142,7 +143,7 @@ fi # $num=0
 if [ "$num" == "1" ]; then
   select=1
 else
-  echo Please Select [1,2,3...,rescan,shell]:
+  echo -e "Please Select [1,2,3...,rescan,${ansi_red}shell${ansi_w}]:"
   read select
   if [ "a$select" == "a" ] || [ "$select" == "rescan" ]; then
     echo Rescan...
@@ -180,13 +181,13 @@ else
   exit
 fi
 
-echo The device for Linux installation is /dev/sda. Do you want to use it? [yes/No]:
+echo -e "The device for Linux installation is /dev/${ansi_red}$dst_disk${ansi_w}. Do you want to use it? [yes/No]:"
 read use_default
 
 if [ "$use_default" != "yes" ]; then
   echo Please enter the device name [e.g., sda, nvme0]:
   src_dev=$( basename $dev |sed 's/[0-9]*$//g' |sed 's/p$//g' )
-  lsblk -o NAME,TYPE,FSTYPE,SIZE,FSUSE%,LABEL |grep -v $src_dev
+  lsblk -o NAME,TYPE,FSTYPE,SIZE,LABEL |grep -v $src_dev
   read dst_disk0
   if  [ $dst_disk0 ] && [ $dst_disk0 != $src_dev ] ; then
     dst_disk=$dst_disk0
@@ -195,8 +196,8 @@ if [ "$use_default" != "yes" ]; then
 fi
 
 while ! [ -e /dev/$dst_disk ]; do
-  echo target disk $dst_disk not find!
-  echo please insert $dst_disk
+  echo -e "target disk ${ansi_red}$dst_disk${ansi_w} not find!"
+  echo -e "please insert ${ansi_red}$dst_disk${ansi_w}"
   partprobe >/dev/null 2>/dev/null
   delay_disp
 done
@@ -206,9 +207,9 @@ clear
 cat /scripts/version
 cat /scripts/build_time
 echo =========================================================
-echo $dev $file $size
+echo -e "${ansi_red}$dev${ansi_w} $file $size"
 echo =========================================================
-echo disk /dev/${dst_disk} All data will delete! continue? [yes/No/rescan/shell]
+echo -e "disk /dev/${ansi_red}${dst_disk}${ansi_w} All data will delete! continue? [yes/No/rescan/shell]"
 read seta
 if [ "$seta" == "shell" ]; then
   run_shell
@@ -244,11 +245,11 @@ echo
 echo =========================================================
 hdparm -i /dev/${dst_disk} | grep Model
 echo =========================================================
-lsblk -o NAME,TYPE,FSTYPE,SIZE,FSUSE%,LABEL /dev/${dst_disk}
+lsblk -o NAME,TYPE,FSTYPE,SIZE,LABEL /dev/${dst_disk}
 echo =========================================================
 
 echo DISK /dev/${dst_disk}*
-echo -e "${ansi_red}ALL DATA WILL DELETE!!!${ansi_w}"
+echo -e "${ansi_shan}${ansi_red}ALL DATA WILL DELETE!!!${ansi_w}"
 echo continue? [yes/No]
 read seta
 if [ "$seta" != "yes" ]; then
@@ -387,8 +388,7 @@ umount -f /2/sys/firmware/efi/efivars /2/dev/pts >/dev/null 2>/dev/null
 umount -f /2/proc /2/dev /2/sys /2/boot >/dev/null 2>/dev/null
 umount -f /2 /1 >/dev/null 2>/dev/null
 
-echo 9. ok!
-df -h
+echo 9. ok! please ctrl-alt-del reboot.
 
 exec 1>/dev/${tty}
 exec 2>/dev/${tty}

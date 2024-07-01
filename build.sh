@@ -14,13 +14,11 @@ then
     apt update
     apt-get -y install hdparm pv parted e2fsprogs dosfstools debootstrap zstd
 fi
-
-if [ "`uname -m`" != "mips64" ] ; then
-
+arch=$( uname -m )
+if [ "$arch" != "mips64" ] ; then
 if ! [ -x /usr/bin/efibootmgr ] ; then
   apt-get -y install efibootmgr
 fi
-
 fi
 
 cd initrd.tmp
@@ -58,7 +56,7 @@ do
 done < file_del.list
 
 echo 添加文件
-cat file_add.list $( uname -m )/file_add.list |\
+cat file_add.list $arch/file_add.list |\
 while read fname
 do
   if ! [ "$fname" ] ; then
@@ -74,14 +72,14 @@ cp -a etc boot scripts make_initrd.sh initrd.tmp
 cd initrd.tmp
 echo "                      `date +%F\ %T`" > scripts/build_time
 mkdir -p lib/modules/$ker_ver/kernel
-lsmod |awk '{print $1".ko"}' >> ../modules.list
-sort ../modules.list |uniq > ../modules.txt
-mv ../modules.txt ../modules.list
+lsmod |awk '{print $1".ko"}' >> ../$arch/modules.list
+sort ../$arch/modules.list |uniq > ../$arch/modules.txt
+mv ../$arch/modules.txt ../$arch/modules.list
 while read mod
 do
   echo $mod
 find /lib/modules/$ker_ver -name ${mod}* -exec cp {} lib/modules/$ker_ver/kernel \;
-done <../modules.list
+done <../$arch/modules.list
 find lib/modules/ -name "*.ko.zst" -exec unzstd -d -f --rm {} \;
 chroot . depmod $ker_ver
 echo 打包为 install.img
@@ -92,7 +90,17 @@ mv install.img udisk
 cp /boot/vmlinu*$ker_ver udisk/vmlinuz
 cp -a readme.html /boot/grub udisk
 cp grub.cfg udisk/grub
-grub-mkimage -o udisk/grubloongarch64.efi -p '(,gpt1)/grub' --prefix '(,gpt1)/grub' part_gpt part_msdos ntfs ext2 fat exfat -O loongarch64-efi
-cp udisk/grubloongarch64.efi udisk/install
+case "$arch" in
+  loongarch64)
+    efi=grubloongarch64.efi
+    ;;
+  x86_64)
+    efi=grubx86_64.efi
+    ;;
+esac
+if [ "$efi" ] ; then 
+grub-mkimage -o udisk/$efi -p '(,gpt1)/grub' --prefix '(,gpt1)/grub' part_gpt part_msdos ntfs ext2 fat exfat serial -O $efi
+cp udisk/$efi udisk/install.$arch
+fi
 ls -l udisk
 echo ok

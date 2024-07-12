@@ -1,8 +1,8 @@
 # UNCONFIGURED FSTAB FOR BASE SYSTEM
-LABEL=boot /boot ext3 defaults,nofail 0 2
+#LABEL=boot /boot ext3 defaults,nofail 0 2
 LABEL=root / ext4 defaults 0 1
-#LABEL=EFI /boot/efi vfat defaults,nofail 0 2
+LABEL=EFI /boot/efi vfat defaults,nofail 0 3
 #LABEL=var /var ext4 defaults,nofail 0 2
 #LABEL=home /home ext4 defaults,nofail 0 2
-#LABEL=SWAP none swap defaults,nofail 0 0
+LABEL=SWAP none swap defaults,nofail 0 0
 none /tmp tmpfs rw,relatime,nofail 0 0

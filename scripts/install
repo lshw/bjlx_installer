@@ -284,15 +284,15 @@ nvme*)
   partition_prefix=""
   ;;
 esac
-echo "1. format /dev/${dst_disk}${partition_prefix}1 /boot"
-mkfs.ext3 -L boot /dev/${dst_disk}${partition_prefix}1 >/dev/null 2>/dev/null
+echo "1. format /dev/${dst_disk}${partition_prefix}1 /boot/efi"
+mkfs.vfat -n EFI /dev/${dst_disk}${partition_prefix}1 >/dev/null 2>/dev/null
 echo "2. format /dev/${dst_disk}${partition_prefix}2 /root"
 mkfs.ext4 -L root /dev/${dst_disk}${partition_prefix}2 >/dev/null 2>/dev/null
 echo "3. format /dev/${dst_disk}${partition_prefix}3 swap"
 mkswap -L SWAP /dev/${dst_disk}${partition_prefix}3 >/dev/null 2>/dev/null
 mount -o sync -t ext4 /dev/${dst_disk}${partition_prefix}2 /2 >/dev/null 2>/dev/null
-mkdir -p /2/boot
-mount -o sync -t ext3 /dev/${dst_disk}${partition_prefix}1 /2/boot >/dev/null 2>/dev/null
+mkdir -p /2/boot/efi
+mount -o sync -t vfat /dev/${dst_disk}${partition_prefix}1 /2/boot/efi >/dev/null 2>/dev/null
 cd /2
 umount /1 2>/dev/null
 mount ${dev} /1 >/dev/null 2>/dev/null
@@ -347,7 +347,7 @@ case $m in
 x86_64)
   #efi todo
   chroot /2 update-grub >/dev/null 2>/dev/null
-  chroot /2 grub-install --efi-directory=/boot --force /dev/${dst_disk} >/dev/null 2>/dev/null
+  chroot /2 grub-install /dev/${dst_disk} >/dev/null 2>/dev/null
   ;;
 mips64)
   cp /scripts/boot.cfg /2/boot/boot.cfg
@@ -360,7 +360,7 @@ loongarch64)
   fi
   hostname=$(cat /2/etc/hostname)
   chroot /2 update-grub >/dev/null 2>/dev/null
-  chroot /2 grub-install --efi-directory=/boot --force /dev/${dst_disk} >/dev/null 2>/dev/null
+  chroot /2 grub-install /dev/${dst_disk} >/dev/null 2>/dev/null
   
   #efibootmgr -L "$hostname" -B >/dev/null 2>/dev/null
   #efibootmgr -c -d /dev/${dst_disk} -p 1 -L "$hostname" -l \\EFI\\debian\\grubloongarch64.efi >/dev/null 2>/dev/null

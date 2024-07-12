@@ -111,8 +111,9 @@ case "$arch" in
     ;;
 esac
 if [ "$efi" ] ; then 
-grub-mkimage -o udisk/$efi -p '(,gpt1)/grub' --prefix '(,gpt1)/grub' part_gpt part_msdos ntfs ext2 fat exfat serial -O $efi
+grub-mkimage -o udisk/$efi -p '(,gpt1)/grub' --prefix '(,gpt1)/grub' part_gpt part_msdos ntfs ext2 fat exfat serial mdraid1x -O $efi
 cp udisk/$efi udisk/install.$arch
 fi
+=======
 ls -l udisk
 echo ok

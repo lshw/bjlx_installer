@@ -100,20 +100,21 @@ case "$arch" in
   cp -a /boot/grub udisk
   cp $arch/grub.cfg udisk/grub
     efi=grubloongarch64.efi
+    efi_type=loongarch64-efi
     ;;
   x86_64)
   cp -a /boot/grub udisk
   cp $arch/grub.cfg udisk/grub
     efi=grubx86_64.efi
+    efi_type=x86_64-efi
     ;;
   mips64)
     cp $arch/boot.cfg udisk
     ;;
 esac
 if [ "$efi" ] ; then 
-grub-mkimage -o udisk/$efi -p '(,gpt1)/grub' --prefix '(,gpt1)/grub' part_gpt part_msdos ntfs ext2 fat exfat serial mdraid1x -O $efi
+grub-mkimage -o udisk/$efi -p '(,gpt1)/grub' --prefix '(,gpt1)/grub' part_gpt part_msdos ntfs ext2 fat exfat serial mdraid1x -O $efi_type
 cp udisk/$efi udisk/install.$arch
 fi
-=======
 ls -l udisk
 echo ok

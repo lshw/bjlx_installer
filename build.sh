@@ -92,15 +92,17 @@ echo 打包为 install.img
 cd ..
 cp install.img /boot
 mv install.img udisk/install.img-$arch
-cp /boot/vmlinu*$ker_ver udisk/vmlinuz
+cp /boot/vmlinu*$ker_ver udisk/vmlinuz-$arch
 cp readme.html udisk
 case "$arch" in
   loongarch64)
   cp -a /boot/grub udisk
-  cp grub.cfg udisk/grub
+  cp $arch/grub.cfg udisk/grub
     efi=grubloongarch64.efi
     ;;
   x86_64)
+  cp -a /boot/grub udisk
+  cp $arch/grub.cfg udisk/grub
     efi=grubx86_64.efi
     ;;
   mips64)

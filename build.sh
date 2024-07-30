@@ -68,7 +68,7 @@ do
   cp -a /$fname initrd.tmp/$dir
 done
 
-cp -a etc boot scripts make_initrd.sh initrd.tmp
+cp -a etc boot scripts $arch/*.txt  make_initrd.sh initrd.tmp
 cd initrd.tmp
 echo "                      `date +%F\ %T`" > scripts/build_time
 mkdir -p lib/modules/$ker_ver/kernel

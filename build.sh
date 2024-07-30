@@ -47,7 +47,8 @@ fi
 fi
 fi
 
-pv /tmp/initrd.img |cpio -i  2>/dev/null
+rm -f /tmp/initrd.img-$ker_ver
+
 echo 清理文件
 cd ..
 while read fname
@@ -90,16 +91,20 @@ echo 打包为 install.img
 ./make_initrd.sh "$gz"
 cd ..
 cp install.img /boot
-mv install.img udisk
+mv install.img udisk/install.img-$arch
 cp /boot/vmlinu*$ker_ver udisk/vmlinuz
-cp -a readme.html /boot/grub udisk
-cp grub.cfg udisk/grub
+cp readme.html udisk
 case "$arch" in
   loongarch64)
+  cp -a /boot/grub udisk
+  cp grub.cfg udisk/grub
     efi=grubloongarch64.efi
     ;;
   x86_64)
     efi=grubx86_64.efi
+    ;;
+  mips64)
+    cp $arch/boot.cfg udisk
     ;;
 esac
 if [ "$efi" ] ; then 

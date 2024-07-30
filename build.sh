@@ -30,20 +30,24 @@ select ker in $ker_ver; do
     break
 done
 fi
-
-echo 展开 /boot/initrd.img-$ker_ver 到临时目录 initrd.tmp
-gz="zstd -19"
-pv /boot/initrd.img-$ker_ver |xz -dc 2>/dev/null |cpio -i  2>/dev/null
+echo 生成新的 initrd.img
+rm -f /tmp/initrd.img-$key_ver
+update-initramfs -c -k $ker_ver -b /tmp
+echo 展开 /tmp/initrd.img-$ker_ver 到临时目录 initrd.tmp
+gz="zstd -22 --ultra"
+pv /tmp/initrd.img-$ker_ver |xz -dc 2>/dev/null |cpio -i  2>/dev/null
 if [ $? != 0 ] ;then
-pv /boot/initrd.img-$ker_ver |lzma -dc 2>/dev/null |cpio -i 2>/dev/null
+pv /tmp/initrd.img-$ker_ver |lzma -dc 2>/dev/null |cpio -i 2>/dev/null
 if [ $? != 0 ] ;then
-pv /boot/initrd.img-$ker_ver |zstd -dc 2>/dev/null |cpio -i 2>/dev/null
+pv /tmp/initrd.img-$ker_ver |zstd -dc 2>/dev/null |cpio -i 2>/dev/null
 if [ $? != 0 ] ;then
 gz=gzip
-pv /boot/initrd.img-$ker_ver |gzip -dc 2>/dev/null |cpio -i 2>/dev/null
+pv /tmp/initrd.img-$ker_ver |gzip -dc 2>/dev/null |cpio -i 2>/dev/null
 fi
 fi
 fi
+
+pv /tmp/initrd.img |cpio -i  2>/dev/null
 echo 清理文件
 cd ..
 while read fname

@@ -1,9 +1,3 @@
-lib/mips64el-linux-gnuabi64/libtinfo.so.6*
-lib/mips64el-linux-gnuabi64/libtinfo.so.5*
-lib/mips64el-linux-gnuabi64/libfdisk.so.1*
-lib/mips64el-linux-gnuabi64/libsmartcols.so.1*
-lib/mips64el-linux-gnuabi64/libncursesw.so.6*
-lib/mips64el-linux-gnuabi64/libncursesw.so.5*
 lib/mips64el-linux-gnuabi64/libext2fs.so*
 lib/mips64el-linux-gnuabi64/libcom_err.so*
 lib/mips64el-linux-gnuabi64/libblkid.so*
@@ -12,3 +6,15 @@ lib/mips64el-linux-gnuabi64/libe2p.so*
 lib/mips64el-linux-gnuabi64/libdl.so*
 lib/mips64el-linux-gnuabi64/libc.so*
 lib/mips64el-linux-gnuabi64/libpthread.so*
+lib/mips64el-linux-gnuabi64/libtinfo.so*
+lib/mips64el-linux-gnuabi64/libfdisk.so*
+lib/mips64el-linux-gnuabi64/libreadline.so*
+lib/mips64el-linux-gnuabi64/libsmartcols.so*
+lib/mips64el-linux-gnuabi64/libncursesw.so*
+lib/mips64el-linux-gnuabi64/libefivar.so*
+lib/mips64el-linux-gnuabi64/libefiboot.so*
+lib/mips64el-linux-gnuabi64/libparted.so*
+lib/mips64el-linux-gnuabi64/liblzma.so*
+lib/mips64el-linux-gnuabi64/liblz4.so*
+lib/mips64el-linux-gnuabi64/libz.so*
+

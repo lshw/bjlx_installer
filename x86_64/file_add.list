@@ -13,3 +13,8 @@ lib/x86_64-linux-gnu/libsmartcols.so*
 lib/x86_64-linux-gnu/libncursesw.so*
 lib/x86_64-linux-gnu/libefivar.so*
 lib/x86_64-linux-gnu/libefiboot.so*
+lib/x86_64-linux-gnu/libparted.so*
+lib/x86_64-linux-gnu/liblzma.so*
+lib/x86_64-linux-gnu/liblz4.so*
+lib/x86_64-linux-gnu/libz.so*
+

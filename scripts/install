@@ -84,7 +84,7 @@ for dev in /dev/sd* /dev/nvme*; do
   export dst_disk="$dst_disk"
 
   cd /1
-  for fname in ${prefix}*_20*.tar.*; do
+  for fname in $( ls *_20*.tar.* |grep -e ^$prefix -e ^$m ) ; do
     if [ "$fname" == "${prefix}*_20*.tar.*" ]; then
       break
     fi

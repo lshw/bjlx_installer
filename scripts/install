@@ -310,8 +310,11 @@ loongarch64)
   mkdir -p /2/boot/efi
   mount -t vfat /dev/${dst_disk}${partition_prefix}1 /2/boot/efi >/dev/null 2>/dev/null
   ;;
+mips*)
+  mount -t ext3 /dev/${dst_disk}${partition_prefix}1 /2/boot >/dev/null 2>/dev/null
+  ;;
 *)
-  mount /dev/${dst_disk}${partition_prefix}1 /2/boot >/dev/null 2>/dev/null
+  mount -t ext4 /dev/${dst_disk}${partition_prefix}1 /2/boot >/dev/null 2>/dev/null
   ;;
 esac
 

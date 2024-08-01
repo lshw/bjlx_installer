@@ -350,6 +350,7 @@ cd /2
 pv /1/$file | $gunzip -dc | tar xv >/tmp/file.list
 sync
 if [ -x /scripts/update-pmon ] ; then
+  cp /scripts/boot.cfg /2/boot/boot.cfg
   if ! [ -x /2/usr/sbin/update-pmon ] ; then
     cp -a /scripts/update-pmon /2/usr/sbin
   fi
@@ -365,11 +366,11 @@ cp /scripts/fstab /2/etc
 
 if [ -e /2/tmp/fix.sh ]; then
   chmod 777 /2/tmp/fix.sh
-  chroot /2 /tmp/fix.sh
+  chroot /2 /tmp/fix.sh 2>/dev/null
 fi
 if [ -e /2/fix.sh ]; then
   chmod 777 /2/fix.sh
-  chroot /2 /fix.sh
+  chroot /2 /fix.sh 2>/dev/null
 fi
 
 echo 6. set bootload
@@ -380,8 +381,7 @@ x86_64)
   chroot /2 grub-install /dev/${dst_disk} >/dev/null 2>/dev/null
   ;;
 mips64)
-  cp /scripts/boot.cfg /2/boot/boot.cfg
-  chroot /2 /usr/sbin/update-pmon
+  chroot /2 /usr/sbin/update-pmon >/dev/null 2>/dev/null
   ;;
 loongarch64)
   mount -t efivarfs none /sys/firmware/efi/efivars >/dev/null 2>/dev/null

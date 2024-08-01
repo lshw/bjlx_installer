@@ -330,7 +330,7 @@ fi
 sleep 2
 cp /$mbr_bakfile /1
 
-echo 5. export $file to /dev/${dst_disk}${partition_prefix}2
+echo 4. export $file to /dev/${dst_disk}${partition_prefix}2
 magic=$(md5sum /scripts/${select}.magic | awk '{print $1}')
 case $magic in
 $lzma)
@@ -367,13 +367,15 @@ cp /scripts/fstab /2/etc
 if [ -e /2/tmp/fix.sh ]; then
   chmod 777 /2/tmp/fix.sh
   chroot /2 /tmp/fix.sh 2>/dev/null
+  rm -f /2/tmp/fix.sh
 fi
 if [ -e /2/fix.sh ]; then
   chmod 777 /2/fix.sh
   chroot /2 /fix.sh 2>/dev/null
+  rm -f /2/fix.sh
 fi
 
-echo 6. set bootload
+echo 5. set bootload
 case $arch in
 x86_64)
   #efi todo
@@ -419,7 +421,7 @@ umount -f /2/sys/firmware/efi/efivars /2/dev/pts >/dev/null 2>/dev/null
 umount -f /2/proc /2/dev /2/sys /2/boot >/dev/null 2>/dev/null
 umount -f /2 /1 >/dev/null 2>/dev/null
 
-echo 9. ok! please ctrl-alt-del reboot.
+echo 6. ok! please ctrl-alt-del reboot.
 
 exec 1>/dev/${tty}
 exec 2>/dev/${tty}

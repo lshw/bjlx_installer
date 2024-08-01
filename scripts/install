@@ -363,6 +363,11 @@ mount --bind /sys /2/sys >/dev/null 2>/dev/null
 mount --bind /dev /2/dev >/dev/null 2>/dev/null
 mount --bind /dev/pts /2/dev/pts >/dev/null 2>/dev/null
 cp /scripts/fstab /2/etc
+if [ -e /pmon-update*.deb ] ; then
+  cp /pmon-update*.deb /2
+  chroot /2 dpkg -i /pmon-update*.deb
+  rm -f /pmon-update*.deb /2/pmon-update*.deb
+fi
 
 if [ -e /2/tmp/fix.sh ]; then
   chmod 777 /2/tmp/fix.sh

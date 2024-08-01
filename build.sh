@@ -76,9 +76,7 @@ done
 
 cp -a etc boot scripts make_initrd.sh initrd.tmp
 cp $arch/*.txt initrd.tmp/scripts
-if [ -e $arch/update_pmon ] ; then
-  cp -a $arch/update_pmon initrd.tmp/scripts
-fi
+cp -a $arch/*.deb initrd.tmp
 cd initrd.tmp
 echo "                      `date +%F\ %T`" > scripts/build_time
 mkdir -p lib/modules/$ker_ver/kernel

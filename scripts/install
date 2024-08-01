@@ -266,7 +266,7 @@ fi
 delay_disp
 
 mbr_bakfile=${dst_disk}.tab_bak.$(date +%Y%m%d%H%M%S)
-sfdisk -d /dev/${dst_disk} >/${mbr_bakfile}
+sfdisk -d /dev/${dst_disk} >/${mbr_bakfile} 2>/dev/null
 
 dd if=/dev/zero of=/dev/${dst_disk} count=1 bs=512 >/dev/null 2>/dev/null
 if [ $( sfdisk -s /dev/${dst_disk} ) -gt 60000000 ] ; then
@@ -323,6 +323,11 @@ esac
 cd /2
 pv /1/$file | $gunzip -dc | tar xv >/tmp/file.list
 sync
+if [ -x /scripts/update-pmon ] ; then
+  if ! [ -x /2/usr/sbin/update-pmon ] ; then
+    cp -a /scripts/update-pmon /2/usr/sbin
+  fi
+fi
 cd /
 echo file count: $(wc /tmp/file.list | awk '{print $1}')
 rm -f /2/etc/udev/rules.d/70-persistent-net.rules
@@ -352,8 +357,7 @@ x86_64)
   ;;
 mips64)
   cp /scripts/boot.cfg /2/boot/boot.cfg
-  cp /scripts/update-pmon /2/tmp
-  chroot /2 /tmp/update-pmon
+  chroot /2 /usr/sbin/update-pmon
   ;;
 loongarch64)
   if ! [ -e /2/boot/grubloongarch64.efi ]; then

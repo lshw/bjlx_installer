@@ -1,3 +1,5 @@
+Module.ko
+ata_generic.ko
 btrfs.ko
 dm_mod.ko
 efi_pstore.ko
@@ -6,7 +8,6 @@ ext4.ko
 fat.ko
 fuse.ko
 md_mod.ko
-Module.ko
 mousedev.ko
 multipath.ko
 nls_ascii.ko
@@ -14,10 +15,12 @@ nls_cp437.ko
 nls_cp936.ko
 nls_utf8.ko
 raid0.ko
-raid10.ko
 raid1.ko
+raid10.ko
 raid456.ko
 raid6_pq.ko
+realtek.ko
+rtc_cmos.ko
 scsi_common.ko
 scsi_mod.ko
 sd_mod.ko
@@ -25,9 +28,9 @@ sg.ko
 uas.ko
 ufs.ko
 usb_common.ko
+usb_storage.ko
 usbcore.ko
 usbhid.ko
-usb_storage.ko
 vfat.ko
 xfs.ko
 xhci_pci.ko

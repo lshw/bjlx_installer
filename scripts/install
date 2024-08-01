@@ -42,6 +42,22 @@ if ! [ -s /scripts/reinstall ]; then
   sleep 3
 fi
 
+arch=$(uname -m)
+case $arch in
+x86_64)
+  prefix="x86"
+  ;;
+mips64)
+  prefix="loongson"
+  bootloader=pmon
+  ;;
+*)
+  prefix=$arch
+  ;;
+esac
+
+dst_disk="sda"
+export dst_disk="$dst_disk"
 echo
 echo
 echo
@@ -68,23 +84,8 @@ for dev in /dev/sd* /dev/nvme*; do
   umount /1 2>/dev/null
   mount ${dev} /1 >/dev/null 2>/dev/null
 
-  m=$(uname -m)
-  case $m in
-  x86_64)
-    prefix="x86"
-    ;;
-  mips64)
-    prefix="loongson"
-    ;;
-  *)
-    prefix=$m
-    ;;
-  esac
-  dst_disk="sda"
-  export dst_disk="$dst_disk"
-
   cd /1
-  for fname in $( ls *_20*.tar.* |grep -e ^$prefix -e ^$m ) ; do
+  for fname in $( ls *_20*.tar.* |grep -e ^$prefix -e ^$arch ) ; do
     if [ "$fname" == "${prefix}*_20*.tar.*" ]; then
       break
     fi
@@ -349,7 +350,7 @@ fi
 echo 6. set bootload
 mount -t efivarfs none /sys/firmware/efi/efivars >/dev/null 2>/dev/null
 mount -t efivarfs none /2/sys/firmware/efi/efivars >/dev/null 2>/dev/null
-case $m in
+case $arch in
 x86_64)
   #efi todo
   chroot /2 update-grub >/dev/null 2>/dev/null

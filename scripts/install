@@ -363,11 +363,6 @@ mount --bind /sys /2/sys >/dev/null 2>/dev/null
 mount --bind /dev /2/dev >/dev/null 2>/dev/null
 mount --bind /dev/pts /2/dev/pts >/dev/null 2>/dev/null
 cp /scripts/fstab /2/etc
-if [ -e /pmon-update*.deb ] ; then
-  cp /pmon-update*.deb /2
-  chroot /2 dpkg -i /pmon-update*.deb
-  rm -f /pmon-update*.deb /2/pmon-update*.deb
-fi
 
 if [ -e /2/tmp/fix.sh ]; then
   chmod 777 /2/tmp/fix.sh
@@ -418,8 +413,8 @@ if ! [ -e /2/usr/local/sbin/ghost.sh ]; then
 fi
 cd /
 umount /1 >/dev/null 2>/dev/null
-mount /dev/${dst_disk}${partition_prefix}2 /1
-cp -a /2/boot/* /1/boot 2>/dev/null
+mount --bind /2 /1
+cp -a /2/boot /1 2>/dev/null
 sync
 umount -f /sys/firmware/efi/efivars >/dev/null 2>/dev/null
 umount -f /2/sys/firmware/efi/efivars /2/dev/pts >/dev/null 2>/dev/null

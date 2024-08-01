@@ -76,7 +76,9 @@ done
 
 cp -a etc boot scripts make_initrd.sh initrd.tmp
 cp $arch/*.txt initrd.tmp/scripts
-cp -a $arch/*.deb initrd.tmp
+if [ -e $arch/update_pmon ] ; then
+  cp -a $arch/update_pmon initrd.tmp/scripts
+fi
 cd initrd.tmp
 echo "                      `date +%F\ %T`" > scripts/build_time
 mkdir -p lib/modules/$ker_ver/kernel
@@ -96,7 +98,7 @@ cd ..
 cp install.img /boot
 mv install.img udisk/install.img-$arch
 cp /boot/vmlinu*$ker_ver udisk/vmlinuz-$arch
-cp readme.html udisk
+cp $arch/readme.html udisk
 case "$arch" in
   loongarch64)
   cp -a /boot/grub udisk

@@ -305,6 +305,7 @@ mkfs.ext4 -L root /dev/${dst_disk}${partition_prefix}2 >/dev/null 2>/dev/null
 echo "3. format /dev/${dst_disk}${partition_prefix}3 swap"
 mkswap -L SWAP /dev/${dst_disk}${partition_prefix}3 >/dev/null 2>/dev/null
 mount -t ext4 /dev/${dst_disk}${partition_prefix}2 /2 >/dev/null 2>/dev/null
+mkdir -p /2/boot
 case $arch in
 loongarch64)
   mkdir -p /2/boot/efi

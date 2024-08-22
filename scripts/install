@@ -1,5 +1,10 @@
 #!/bin/bash
 
+grep " root=" /proc/cmdline >/dev/null 2>/dev/null
+if [ $? = 0 ] ; then
+	#如果cmdline带root= 则跳过
+	exit
+fi
 export TERM=linux
 if [ "a$1" == "a" ]; then
   tty=console

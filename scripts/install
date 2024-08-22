@@ -169,6 +169,9 @@ if [ -e /scripts/${select}.dev ]; then
   dev=$(cat /scripts/${select}.dev)
   if [ "$(grep sda /scripts/${select}.dev)" ]; then
     dst_disk=sdb
+    if ! [ -x /sys/block/$dst_disk ] ; then
+	    dst_disk=nvme0n1
+    fi
     export dst_disk="$dst_disk"
   fi
   if [ "a$1" != "a" ]; then

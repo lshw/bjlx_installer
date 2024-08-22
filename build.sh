@@ -114,6 +114,7 @@ case "$arch" in
     ;;
   mips64)
     cp $arch/boot.cfg udisk
+    cp $arch/startup.nsh udisk
     ;;
 esac
 if [ "$efi" ] ; then 

@@ -393,6 +393,9 @@ x86_64)
   chroot /2 grub-install /dev/${dst_disk} >/dev/null 2>/dev/null
   ;;
 mips64)
+  #昆仑固件，使用startup.nsh
+  cp /1/install-loongson3 /2/boot/vmlinuz0
+  echo "run fs0:/vmlinuz0 root=LABEL=root net.ifnames=0 biosdevname=0" > /2/boot/startup.nsh
   chroot /2 /usr/sbin/update-pmon >/dev/null 2>/dev/null
   ;;
 loongarch64)

@@ -194,9 +194,9 @@ echo -e "The device for Linux installation is /dev/${ansi_red}$dst_disk${ansi_w}
 read use_default
 
 if [ "$use_default" != "yes" ]; then
-  echo Please enter the device name [e.g., sda, nvme0]:
   src_dev=$( basename $dev |sed 's/[0-9]*$//g' |sed 's/p$//g' )
   lsblk -o NAME,TYPE,FSTYPE,SIZE,LABEL |grep -v $src_dev
+  echo Please enter the device name [e.g., sda, nvme0n1]:
   read dst_disk0
   if  [ $dst_disk0 ] && [ $dst_disk0 != $src_dev ] ; then
     dst_disk=$dst_disk0
@@ -206,9 +206,11 @@ fi
 
 while ! [ -e /dev/$dst_disk ]; do
   echo -e "target disk ${ansi_red}$dst_disk${ansi_w} not find!"
-  echo -e "please insert ${ansi_red}$dst_disk${ansi_w}"
   partprobe >/dev/null 2>/dev/null
   delay_disp
+  lsblk -o NAME,TYPE,FSTYPE,SIZE,LABEL |grep -v $src_dev
+  echo Please enter the device name [e.g., sda, nvme0n1]:
+  read dst_disk0
 done
 
 clear

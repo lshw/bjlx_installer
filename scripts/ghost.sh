@@ -3,20 +3,30 @@ aptitude clean
 ver=`cat /etc/debian_version|tr -d "\r\n "`
 ver=${ver%/*}
 echo $ver
-echo 'proc/*' >/tmp/exclude.list
-echo 'mnt/*' >>/tmp/exclude.list
-echo 'tmp/*' >>/tmp/exclude.list
-echo 'dev/*' >>/tmp/exclude.list
-echo 'lost+found/*' >>/tmp/exclude.list
-echo 'sys/*' >>/tmp/exclude.list
-echo 'media/*' >>/tmp/exclude.list
-echo 'run/*' >>/tmp/exclude.list
-echo 'home/*' >>/tmp/exclude.list
-echo 'home1/*' >>/tmp/exclude.list
-echo 'var/lib/mysql/*' >>/tmp/exclude.list
-echo 'var/log/mysql/*' >>/tmp/exclude.list
-echo 'var/log/apache2/*' >>/tmp/exclude.list
-echo 'etc/openvpn/*' >>/tmp/exclude.list
+find /  | grep -v \
+ -e "^/proc/" \
+ -e "^/1/" \
+ -e "^/2/" \
+ -e "^/3/" \
+ -e "^/4/" \
+ -e "^/mnt/" \
+ -e "^/tmp/" \
+ -e "^/dev/" \
+ -e "^lost+found/" \
+ -e "^/sys/" \
+ -e "^/media/" \
+ -e "^/run/" \
+ -e "^/root/" \
+ -e "^/home/mips" \
+ -e "^/home/loongson/" \
+ -e "^/home1/" \
+ -e "^/var/tmp/" \
+ -e "^/var/lib/mysql/" \
+ -e "^/var/log/mysql/" \
+ -e "^/var/log/apache2/" \
+ -e "^/var/log/journal/" \
+  > /tmp/all.list
+find /root/.ssh >> /tmp/all.list
 cd /
 mach=$( uname -m )
 which zstd
@@ -28,9 +38,8 @@ else
         dst_file="${mach}_debian_${ver}_`date +%Y%m%d`.tar.gz"
 fi
 echo make home/$dst_file
-echo home/$dst_file >>/tmp/exclude.list
 if [ "`which pv`" ] ; then
-  tar c --exclude-from=/tmp/exclude.list * |pv|$gzip >/home/$dst_file
+  tar c --no-recursion -T /tmp/all.list |pv|$gzip >/home/$dst_file
 else
- tar cv --exclude-from=/tmp/exclude.list * |$gzip >/home/$dst_file
+ tar cv --no-recursion -T /tmp/all.list |$gzip >/home/$dst_file
 fi

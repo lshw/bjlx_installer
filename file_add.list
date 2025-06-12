@@ -23,5 +23,6 @@ sbin/fsck.vfat
 sbin/mke2fs
 sbin/mkfs.ext*
 usr/sbin/mkfs.vfat
+usr/sbin/mkfs.fat
 usr/bin/efibootmgr
 lib/terminfo/l/linux

@@ -34,20 +34,9 @@ echo 生成新的 initrd.img
 rm -f /tmp/initrd.img-$key_ver
 update-initramfs -c -k $ker_ver -b /tmp
 echo 展开 /tmp/initrd.img-$ker_ver 到临时目录 initrd.tmp
+
 gz="xz"
-pv /tmp/initrd.img-$ker_ver |xz -dc 2>/dev/null |cpio -i  2>/dev/null
-if [ $? != 0 ] ;then
-gz="lzma"
-pv /tmp/initrd.img-$ker_ver |lzma -dc 2>/dev/null |cpio -i 2>/dev/null
-if [ $? != 0 ] ;then
-gz="gzip"
-pv /tmp/initrd.img-$ker_ver |gzip -dc 2>/dev/null |cpio -i 2>/dev/null
-if [ $? != 0 ] ;then
-gz="zstd -22 --ultra"
-pv /tmp/initrd.img-$ker_ver |zstd -dc 2>/dev/null |cpio -i 2>/dev/null
-fi
-fi
-fi
+unmkinitramfs /tmp/initrd.img-$ker_ver .
 rm -f /tmp/initrd.img-$ker_ver
 
 echo 清理文件
@@ -91,7 +80,7 @@ do
 find /lib/modules/$ker_ver -name ${mod}* -exec cp {} lib/modules/$ker_ver/kernel \;
 done <../$arch/modules.list
 find lib/modules/ -name "*.ko.zst" -exec unzstd -d -f --rm {} \;
-chroot . depmod $ker_ver
+chroot . depmod -a $ker_ver
 echo 打包为 install.img
 ./make_initrd.sh "$gz"
 cd ..

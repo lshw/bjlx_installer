@@ -38,6 +38,7 @@ echo 展开 /tmp/initrd.img-$ker_ver 到临时目录 initrd.tmp
 gz="xz"
 unmkinitramfs /tmp/initrd.img-$ker_ver .
 rm -f /tmp/initrd.img-$ker_ver
+mkdir -p /sys /dev /proc
 
 echo 清理文件
 cd ..

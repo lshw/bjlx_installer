@@ -1,4 +1,6 @@
 #!/bin/bash
+cd $(dirname $0)
+umount -f initrd.tmp/proc initrd.tmp/sys initrd.tmp/dev 2>/dev/null
 rm -rf initrd.tmp install.img
 mkdir initrd.tmp udisk -p
 
@@ -35,7 +37,6 @@ rm -f /tmp/initrd.img-$key_ver
 update-initramfs -c -k $ker_ver -b /tmp
 echo 展开 /tmp/initrd.img-$ker_ver 到临时目录 initrd.tmp
 
-gz="xz"
 unmkinitramfs /tmp/initrd.img-$ker_ver .
 rm -f /tmp/initrd.img-$ker_ver
 mkdir -p /sys /dev /proc
@@ -83,7 +84,9 @@ done <../$arch/modules.list
 find lib/modules/ -name "*.ko.zst" -exec unzstd -d -f --rm {} \;
 chroot . depmod -a $ker_ver
 echo 打包为 install.img
-./make_initrd.sh "$gz"
+./make_initrd.sh gzip
+#./make_initrd.sh "zstd --ultra -22" #压缩率最高， 很慢
+#./make_initrd.sh "zstd"
 cd ..
 cp install.img /boot
 mv install.img udisk/install.img-$arch

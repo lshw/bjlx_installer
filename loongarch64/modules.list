@@ -28,6 +28,8 @@ fuse.ko
 fwnode_mdio.ko
 hfs.ko
 hfsplus.ko
+hid_generic.ko
+hid.ko
 ipmi_devintf.ko
 ipmi_msghandler.ko
 ipmi_si.ko

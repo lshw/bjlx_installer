@@ -66,6 +66,7 @@ export dst_disk="$dst_disk"
 echo
 echo
 echo
+modprobe fat 2>/dev/null
 modprobe vfat 2>/dev/null
 find /lib/modules \( -name "vfat.ko" \
   -o -name "nls_cp936.ko" \

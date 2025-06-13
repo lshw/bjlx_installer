@@ -71,6 +71,10 @@ if [ -e $arch/update_pmon ] ; then
   cp -a $arch/update_pmon initrd.tmp/scripts
 fi
 cd initrd.tmp
+mkdir -p sbin
+cd sbin
+ln -s ../bin/busybox modprobe
+cd ..
 echo "                      `date +%F\ %T`" > scripts/build_time
 mkdir -p lib/modules/$ker_ver/kernel
 lsmod |awk '{print $1".ko"}' >> ../$arch/modules.list
@@ -111,7 +115,7 @@ case "$arch" in
     ;;
 esac
 if [ "$efi" ] ; then 
-grub-mkimage -o udisk/$efi -p '(,gpt1)/grub' part_gpt part_msdos ntfs ext2 fat exfat serial mdraid1x normal linux search search_fs_file configfile  if -O $efi_type --config grub0.cfg
+grub-mkimage -o udisk/$efi -p '(,gpt1)/grub' part_gpt part_msdos ntfs ext2 fat exfat serial mdraid1x normal linux search search_fs_file configfile   -O $efi_type --config grub0.cfg
 cp udisk/$efi udisk/install.$arch
 fi
 ls -l udisk

@@ -10,3 +10,4 @@ usr/lib/udev/rules.d/73-special-net-names.rules
 usr/lib/udev/rules.d/73-usb-net-by-mac.rules	
 usr/lib/udev/rules.d/75-net-description.rules	
 usr/lib/udev/rules.d/95-dm-notify.rules	
+sbin/modprobe

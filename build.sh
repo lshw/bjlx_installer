@@ -115,7 +115,7 @@ case "$arch" in
     ;;
 esac
 if [ "$efi" ] ; then 
-grub-mkimage -o udisk/$efi -p '(,gpt1)/grub' part_gpt part_msdos ntfs ext2 fat exfat serial mdraid1x normal linux search search_fs_file configfile   -O $efi_type --config grub0.cfg
+grub-mkimage -o udisk/$efi -p '(,gpt1)/grub' part_gpt part_msdos ntfs ext2 fat exfat serial mdraid1x normal linux search search_fs_file configfile  if -O $efi_type --config grub0.cfg
 cp udisk/$efi udisk/install.$arch
 fi
 ls -l udisk

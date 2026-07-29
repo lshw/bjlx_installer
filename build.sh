@@ -2,7 +2,7 @@
 cd $(dirname $0)
 umount -f initrd.tmp/proc initrd.tmp/sys initrd.tmp/dev 2>/dev/null
 rm -rf initrd.tmp install.img
-mkdir initrd.tmp udisk -p
+mkdir initrd.tmp udisk/EFI/BOOT -p
 
 if ! [ -x /sbin/hdparm ] \
     || ! [ -x /usr/bin/pv ] \
@@ -100,12 +100,16 @@ case "$arch" in
   loongarch64)
   cp -a /boot/grub udisk
   cp $arch/grub.cfg udisk/grub
+  cp $arch/grub.cfg udisk/EFI/BOOT
     efi=grubloongarch64.efi
+    boot=GRUBLOONGARCH64.EFI
     efi_type=loongarch64-efi
     ;;
   x86_64)
   cp -a /boot/grub udisk
   cp $arch/grub.cfg udisk/grub
+  cp $arch/grub.cfg udisk/EFI/BOOT
+    boot=BOOTX64.EFI
     efi=grubx86_64.efi
     efi_type=x86_64-efi
     ;;
@@ -117,6 +121,9 @@ esac
 if [ "$efi" ] ; then 
 grub-mkimage -o udisk/$efi -p '(,gpt1)/grub' part_gpt part_msdos ntfs ext2 fat exfat serial mdraid1x normal linux search search_fs_file configfile  if -O $efi_type --config grub0.cfg
 cp udisk/$efi udisk/install.$arch
+if [ "$boot" ] ; then
+  cp udisk/$efi udisk/EFI/BOOT
+fi
 fi
 ls -l udisk
 echo ok

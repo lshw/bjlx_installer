@@ -387,11 +387,14 @@ if [ -e /2/fix.sh ]; then
 fi
 
 echo 5. set bootload
+mkdir -p /boot/efi/EFI/BOOT
 case $arch in
 x86_64)
   #efi todo
+  cp /x86_64/shimx64.efi /2/boot/efi/EFI/BOOT/BOOTX64.EFI
   chroot /2 update-grub >/dev/null 2>/dev/null
   chroot /2 grub-install /dev/${dst_disk} >/dev/null 2>/dev/null
+  cp /boot/efi/EFI/debian/grub.cfg /2/boot/efi/EFI/BOOT
   ;;
 mips64)
   #昆仑固件，使用startup.nsh
@@ -402,12 +405,11 @@ mips64)
 loongarch64)
   mount -t efivarfs none /sys/firmware/efi/efivars >/dev/null 2>/dev/null
   mount -t efivarfs none /2/sys/firmware/efi/efivars >/dev/null 2>/dev/null
-  if ! [ -e /2/boot/grubloongarch64.efi ]; then
-    cp /boot/grubloongarch64.efi /2/boot
-  fi
   hostname=$(cat /2/etc/hostname)
   chroot /2 update-grub >/dev/null 2>/dev/null
   chroot /2 grub-install /dev/${dst_disk} >/dev/null 2>/dev/null
+  cp /loongarch64/GRUBLOONGARCH64.EFI /2/boot/efi/EFI/BOOT/
+  cp /boot/efi/EFI/debian/grub.cfg /2/boot/efi/EFI/BOOT
   
   #efibootmgr -L "$hostname" -B >/dev/null 2>/dev/null
   #efibootmgr -c -d /dev/${dst_disk} -p 1 -L "$hostname" -l \\EFI\\debian\\grubloongarch64.efi >/dev/null 2>/dev/null

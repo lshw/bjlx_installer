@@ -15,3 +15,8 @@ udisk目录下，就是做好的龙芯2K，龙芯3的安装程序，可以复制
 linux系统的tar包， 可以在 https://mirrors.tuna.tsinghua.edu.cn/loongson/install 下载  
 也可以自行打包， 只要文件命名为 loongson*20*.tar.* ， 就可以被识别使用  
 比如 loongson-2k-debian10-20191105.tar.xz    
+
+
+efi的回退目录和文件:
+x86_64		/boot/efi/BOOT/BOOTX64.EFI
+loongarch64 	/boot/efi/EFI/BOOT/BOOTLOONGARCH64.EFI
